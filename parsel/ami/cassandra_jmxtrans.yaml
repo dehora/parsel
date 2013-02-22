@@ -1,0 +1,151 @@
+graphite_host: "graphite.server.pri"
+graphite_port: 2003
+query_port: 7199
+
+queries:
+    - name: mempool
+      obj: "java.lang:type=MemoryPool,name=*"
+      resultAlias: "memorypool"
+      attr:
+        - "Usage"
+    - name: gc
+      obj: "java.lang:type=GarbageCollector,name=*"
+      resultAlias: "gc"
+      attr:
+        - "CollectionCount"
+        - "CollectionTime"
+    - name: sys
+      obj: "java.lang:type=OperatingSystem"
+      resultAlias: "sys"
+      attr:
+        - "SystemLoadAverage"
+        - "AvailableProcessors"
+        - "TotalPhysicalMemorySize"
+        - "FreePhysicalMemorySize"
+        - "TotalSwapSpaceSize"
+        - "FreeSwapSpaceSize"
+        - "OpenFileDescriptorCount"
+        - "MaxFileDescriptorCount"
+    - name: threads
+      obj : "java.lang:type=Threading"
+      resultAlias: "threads"
+      attr:
+        - "DaemonThreadCount"
+        - "PeakThreadCount"
+        - "ThreadCount"
+        - "TotalStartedThreadCount"
+    #
+    # Cassandra Metrics
+    #
+    - name: caches
+      obj : "org.apache.cassandra.db:type=Caches"
+      resultAlias : "caches"
+      attr:
+        - "KeyCacheEntries"
+        - "KeyCacheHits"
+        - "KeyCacheRecentHitRate"
+        - "KeyCacheRequests"
+        - "KeyCacheSize"
+        - "RowCacheEntries"
+        - "RowCacheHits"
+        - "RowCacheRecentHitRate"
+        - "RowCacheRequests"
+        - "RowCacheSize"
+
+    - name: commitlog
+      obj : "org.apache.cassandra.db:type=Commitlog"
+      resultAlias : "commitlog"
+      attr:
+        - "CompletedTasks"
+        - "PendingTasks"
+        - "TotalCommitlogSize"
+
+    - name: compaction
+      obj : "org.apache.cassandra.db:type=CompactionManager"
+      resultAlias : "compaction"
+      attr:
+        - "CompletedTasks"
+        - "PendingTasks"
+        - "TotalBytesCompacted"
+        - "TotalCompactionsCompleted"
+
+    - name: internalstage
+      obj : "org.apache.cassandra.internal:type=*"
+      resultAlias : "internalstage"
+      attr:
+        - "ActiveCount"
+        - "CompletedTasks"
+        - "CurrentlyBlockedTasks"
+        - "PendingTasks"
+        - "TotalBlockedTasks"
+
+    - name: requestmetrics
+      obj: "org.apache.cassandra.metrics:type=*,name=*,"
+      resultAlias: "requestmetrics"
+      attr:
+        - "Count"
+
+    - name: messagingservice
+      obj : "org.apache.cassandra.net:type=MessagingService"
+      resultAlias : "messagingservice"
+      attr:
+        - "RecentTotalTimouts"
+        - "TotalTimeouts"
+
+    - name: requeststage
+      obj : "org.apache.cassandra.request:type=*"
+      resultAlias : "requeststage"
+      attr:
+        - "ActiveCount"
+        - "CompletedTasks"
+        - "CurrentlyBlockedTasks"
+        - "PendingTasks"
+        - "TotalBlockedTasks"
+
+
+    - name: columnfamily
+      obj : "org.apache.cassandra.db:type=ColumnFamilies,columnfamily=*,keyspace=*"
+      resultAlias : "columnfamily"
+      attr:
+        - "BloomFilterDiskSpaceUsed"
+        - "BloomFilterFalsePositives"
+        - "BloomFilterFalseRatio"
+        - "BloomFilterFalseRatio"
+        - "LiveDiskSpaceUsed"
+        - "LiveSSTableCount"
+        - "MaxRowSize"
+        - "MeanRowSize"
+        - "MemtableColumnsCount"
+        - "MemtableDataSize"
+        - "MemtableSwitchCount"
+        - "MinRowSize"
+        - "PendingTasks"
+        - "ReadCount"
+        - "RecentBloomFilterFalsePositives"
+        - "RecentBloomFilterFalseRatio"
+        - "RecentReadLatencyMicros"
+        - "RecentWriteLatencyMicros"
+        - "TotalDiskSpaceUsed"
+        - "TotalReadLatencyMicros"
+        - "TotalWriteLatencyMicros"
+        - "WriteCount"
+
+
+sets:
+  - setname: cassandra_jmxtrans
+    query_names:
+            - mempool
+            - gc
+            - sys
+            - threads
+            - caches
+            - commitlog
+            - compaction
+            - internalstage
+            - requestmetrics
+            - messagingservice
+            - requeststage
+            - columnfamily
+
+    hosts:
+            - 127.0.0.1
