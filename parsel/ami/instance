@@ -56,8 +56,8 @@ def start(max_count,
         instance_ids.append(instance.id)
 
         print 'Instance %s, %s, %s created.' % (instance.id, instance.public_dns_name, instance.ip_address,)
-        print 'Will begin uploading parsel in 15s'
-        time.sleep(15)
+        print 'Will begin uploading parsel in 30s'
+        time.sleep(30)
 
         host = instance.public_dns_name
         sftp = create_sftp(host, ssh_username, ssh_key_file_path)

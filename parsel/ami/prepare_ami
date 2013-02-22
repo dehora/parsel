@@ -1,23 +1,13 @@
 #!/usr/bin/env python
 
-import shlex
-import subprocess
 import time
 import os
 
 from parsel.ntp import TimeInstaller
 from parsel.logger import exe
+from parsel.logger import pipe
 
 # Based on ComboAMI, see https://github.com/riptano/ComboAMI
-
-
-def pipe(command1, command2):
-    print '[PIPE] %s | %s' % (command1, command2)
-    p1 = subprocess.Popen(shlex.split(command1), stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(shlex.split(command2), stdin=p1.stdout)
-    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
-    output = p2.communicate()[0]
-    return output
 
 
 def update_distro():
@@ -177,6 +167,12 @@ def setup_parsel_logging():
     exe("sudo chown -hR ubuntu:ubuntu /var/log/parsel", shellEnabled=True)
 
 
+def install_jmxtrans():
+    exe('sudo wget https://viscis-archive.s3.amazonaws.com/jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
+    exe('sudo dpkg -i jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
+    exe('sudo rm jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
+
+
 update_distro()
 setup_parsel_logging()
 TimeInstaller().setup_ntp()
@@ -190,6 +186,7 @@ install_initd()
 evil_priam_auth()
 install_tomcat()
 exe('sudo service tomcat7 stop')
+install_jmxtrans()
 cleandown_instance()
 
 print "Image Configured."

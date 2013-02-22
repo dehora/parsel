@@ -2,6 +2,7 @@ AWSID=$1
 AWS_ACCESS_KEY=$2
 AWS_SECRET_KEY=$3
 
+sudo rm /var/log/parsel/parsel.log
 sudo mv /home/ubuntu/*.pem /mnt
 
 CERT_PEM=/mnt/cert-*.pem
@@ -24,6 +25,6 @@ REGION=EU;              yes | ec2-upload-bundle -m $MANIFEST -a $AWS_ACCESS_KEY 
 export EC2_HOME=/root/ec2/current-ec2-api-tools
 export JAVA_HOME=/opt/java/64/jdk1.6.0_38
 
-ec2-register $S3BUCKET/$AMINAME.manifest.xml -region eu-west-1 -n "Cassandra AMI $VERSION" -d "Starts a Cassandra Server" -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY
-#ec2-register $S3BUCKET/$AMINAME.manifest.xml -region us-west-1 -n "Cassandra AMI $VERSION" -d "Starts a Cassandra Server" -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY
-#ec2-register $S3BUCKET/$AMINAME.manifest.xml -region us-west-2 -n "Cassandra AMI $VERSION" -d "Starts a Cassandra Server" -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY
+ec2-register $S3BUCKET/$AMINAME.manifest.xml -region eu-west-1 -n "Cassandra AMI $VERSION" -d "Starts a Priam managed Cassandra Server" -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY
+#ec2-register $S3BUCKET/$AMINAME.manifest.xml -region us-west-1 -n "Cassandra AMI $VERSION" -d "Starts a Priam managed Cassandra Server" -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY
+#ec2-register $S3BUCKET/$AMINAME.manifest.xml -region us-west-2 -n "Cassandra AMI $VERSION" -d "Starts a Priam managed Cassandra Server" -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY
