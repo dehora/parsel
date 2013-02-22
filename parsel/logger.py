@@ -64,17 +64,17 @@ def pipe(command1, command2, log=True):
     if not log:
         read = ""
     if len(read) > 0:
-        log(t + ' ' + command1 + ' | ' + command2 + ":\n" + read)
+        _log(t + ' ' + command1 + ' | ' + command2 + ":\n" + read)
     else:
-        log(t + ' ' + command1 + ' | ' + command2)
+        _log(t + ' ' + command1 + ' | ' + command2)
     output = p2.communicate()[0]
     if log:
         if read and len(read) > 0:
-            log(t + ' ' + command1 + ' | ' + command2 + ":\n" + read)
+            _log(t + ' ' + command1 + ' | ' + command2 + ":\n" + read)
         if output and len(output[0]) > 0:
-            log(t + ' ' + command1 + ' | ' + command2 + ":\n" + output[0])
+            _log(t + ' ' + command1 + ' | ' + command2 + ":\n" + output[0])
         if output and len(output[1]) > 0:
-            log(t + ' ' + command1 + ' | ' + command2 + ":\n" + output[1])
+            _log(t + ' ' + command1 + ' | ' + command2 + ":\n" + output[1])
         return output
 
 
