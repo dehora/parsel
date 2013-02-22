@@ -1,0 +1,195 @@
+#!/usr/bin/env python
+
+import shlex
+import subprocess
+import time
+import os
+
+from parsel.ntp import TimeInstaller
+from parsel.logger import exe
+
+# Based on ComboAMI, see https://github.com/riptano/ComboAMI
+
+
+def pipe(command1, command2):
+    print '[PIPE] %s | %s' % (command1, command2)
+    p1 = subprocess.Popen(shlex.split(command1), stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(shlex.split(command2), stdin=p1.stdout)
+    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+    output = p2.communicate()[0]
+    return output
+
+
+def update_distro():
+    pipe('echo "deb http://archive.canonical.com/ precise partner"',
+         'sudo tee -a /etc/apt/sources.list.d/java.sources.list')
+    exe('sudo apt-get -y update')
+    time.sleep(10)
+    exe('sudo apt-get -y update')
+
+
+def install_packages():
+    while True:
+        output = exe(
+            'sudo apt-get -y install --fix-missing libjna-java htop emacs23-nox sysstat iftop binutils pssh pbzip2 xfsprogs zip unzip ruby openssl libopenssl-ruby curl maven2 ant liblzo2-dev ntp subversion python-pip tree unzip ruby xfsprogs')
+        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
+            break
+
+    while True:
+        output = exe(
+            'sudo apt-get -y install acl policykit-1 ca-certificates-java icedtea-6-jre-cacao java-common jsvc libavahi-client3 libavahi-common-data libavahi-common3 libcommons-daemon-java libcups2 libjna-java libjpeg62 liblcms1 libnspr4-0d libnss3-1d tzdata-java')
+        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
+            break
+
+    while True:
+        output = exe('sudo apt-get -y --no-install-recommends install mdadm')
+        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
+            break
+
+
+def boostrap_maven():
+    # dummy op to boostrap mvn, we expect this to fail (no pom found)
+    exe('sudo -u ubuntu mvn install')
+    time.sleep(5)
+
+
+def boostrap_cassandra_libs():
+    # put the c* libs into .m2
+    home_path = os.getcwd()
+    exe('git clone https://github.com/apache/cassandra.git')
+    os.chdir('cassandra')
+    exe('ant')
+    os.chdir(home_path)
+    exe('rm -rf cassandra/')
+
+
+def install_java():
+    home_path = '/home/ubuntu/parsel/parsel/ami'
+    exe('sudo wget https://viscis-archive.s3.amazonaws.com/jdk-6u38-linux-x64.bin')
+    exe('sudo mkdir -p /opt/java/64')
+    exe('sudo mv jdk-6u38-linux-x64.bin /opt/java/64/')
+    os.chdir('/opt/java/64/')
+    exe('sudo chmod +x jdk-6u38-linux-x64.bin')
+    exe('echo "Installing Java, this can take a while."')
+    exe('sudo ./jdk-6u38-linux-x64.bin')
+    exe('sudo update-alternatives --install "/usr/bin/java" "java" "/opt/java/64/jdk1.6.0_38/bin/java" 1')
+    exe('sudo update-alternatives --set java /opt/java/64/jdk1.6.0_38/bin/java')
+    os.chdir(home_path)
+
+
+def setup_profiles():
+    profile = '/home/ubuntu/.profile'
+    exe('sudo chmod 777 ' + profile)
+    with open(profile, 'a') as f:
+        f.write("""
+
+python parsel/parsel/rund/motd.py
+export JAVA_HOME=/opt/java/64/jdk1.6.0_38
+export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
+""")
+    exe('sudo chmod 644 ' + profile)
+
+    bashrc = '/home/ubuntu/.bashrc'
+    exe('sudo chmod 777 ' + bashrc)
+    with open(bashrc, 'a') as f:
+        f.write("""
+
+export JAVA_HOME=/opt/java/64/jdk1.6.0_38
+export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
+""")
+    exe('sudo chmod 644 ' + bashrc)
+    exe('sudo chmod 777 /root/.profile')
+    exe('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.profile')
+    exe('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.profile')
+    exe('sudo chmod 644 /root/.profile')
+    exe('sudo chmod 777 /root/.bashrc')
+    exe('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.bashrc')
+    exe('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.bashrc')
+    exe('sudo chmod 644 /root/.bashrc')
+
+    os.chdir('/home/ubuntu')
+
+
+def install_initd():
+    initscript = """#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Start AMI Configurations on boot.
+# Description:       Enables AMI Configurations on startup.
+### END INIT INFO
+
+export JAVA_HOME=/opt/java/64/jdk1.6.0_38
+export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
+sudo su -c 'ulimit -n 32768'
+sudo mkdir -p /etc/parsel
+sudo mkdir -p /var/log/parsel
+sudo touch /etc/parsel/parsel.conf
+sudo chown -R ubuntu:ubuntu /etc/parsel
+sudo chown -R ubuntu:ubuntu /var/log/parsel
+echo 1 | sudo tee /proc/sys/vm/overcommit_memory
+echo "\n$(date +\%Y-\%m-\%d-\%H\%M\%S) -------------------------------------\n" >> /var/log/parsel/parsel.log
+cd /home/ubuntu/parsel/parsel/rund
+python initd_configure.py"""
+
+    exe('sudo touch /etc/init.d/init-cassandra.sh')
+    exe('sudo chmod 777 /etc/init.d/init-cassandra.sh')
+    with open('/etc/init.d/init-cassandra.sh', 'w') as f:
+        f.write(initscript)
+    exe('sudo chmod 755 /etc/init.d/init-cassandra.sh')
+    exe('sudo update-rc.d -f init-cassandra.sh start 99 2 3 4 5 .')
+
+
+def setup_limits_conf():
+    pipe('echo "* soft nofile 32768"', 'sudo tee -a /etc/security/limits.conf')
+    pipe('echo "* hard nofile 32768"', 'sudo tee -a /etc/security/limits.conf')
+    pipe('echo "root soft nofile 32768"', 'sudo tee -a /etc/security/limits.conf')
+    pipe('echo "root hard nofile 32768"', 'sudo tee -a /etc/security/limits.conf')
+
+
+def cleandown_instance():
+    exe('sudo rm .ssh/authorized_keys')
+    exe("sudo rm -rf /etc/ssh/ssh_host_dsa_key*", shellEnabled=True)
+    exe("sudo rm -rf /etc/ssh/ssh_host_key*", shellEnabled=True)
+    exe("sudo rm -rf /etc/ssh/ssh_host_rsa_key*", shellEnabled=True)
+    exe("sudo rm -rf /tmp/*", shellEnabled=True)
+    exe("sudo rm -rf /tmp/.*", shellEnabled=True)
+    exe('rm -rf ~/.bash_history && history -c')
+
+
+def evil_priam_auth():
+    exe("sudo mv /home/ubuntu/awscredential.properties /etc", shellEnabled=True)
+
+
+def install_tomcat():
+    while True:
+        output = exe('sudo apt-get -y install tomcat7')
+        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
+            break
+
+
+def setup_parsel_logging():
+    exe("sudo mkdir -p /var/log/parsel", shellEnabled=True)
+    exe("sudo chown -hR ubuntu:ubuntu /var/log/parsel", shellEnabled=True)
+
+
+update_distro()
+setup_parsel_logging()
+TimeInstaller().setup_ntp()
+install_java()
+install_packages()
+setup_profiles()
+boostrap_maven()
+boostrap_cassandra_libs()
+setup_limits_conf()
+install_initd()
+evil_priam_auth()
+install_tomcat()
+exe('sudo service tomcat7 stop')
+cleandown_instance()
+
+print "Image Configured."
