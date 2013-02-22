@@ -77,7 +77,7 @@ def start(max_count,
         print '  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i %s -l %s %s \n' % (
             os.path.join(ssh_key_file_path), ssh_username, instance.ip_address,)
 
-    ec2.create_tags(instance_ids, {"baker": "C* Baking Instance"})
+    ec2.create_tags(instance_ids, {"baker": "CassandraBaker"})
     print """Finished. All instances tagged as 'baker':'CassandraBaker'"""
 
 
