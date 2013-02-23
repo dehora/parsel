@@ -1,7 +1,12 @@
 graphite_host: "graphite.server.pri"
 graphite_port: 2003
+
+# Global port to query JMX on
 query_port: 7199
 
+# Query definitions, every query needs obj, resultAlias, attr
+#   from jmxtrans format, "name" must be given for referencing
+#   the query in host sets
 queries:
     - name: mempool
       obj: "java.lang:type=MemoryPool,name=*"
@@ -69,9 +74,9 @@ queries:
         - "TotalBytesCompacted"
         - "TotalCompactionsCompleted"
 
-    - name: internalstage
-      obj : "org.apache.cassandra.internal:type=*"
-      resultAlias : "internalstage"
+    - name: flushwriter
+      obj : "org.apache.cassandra.internal:type=FlushWriter"
+      resultAlias : "flushwriter"
       attr:
         - "ActiveCount"
         - "CompletedTasks"
@@ -79,9 +84,27 @@ queries:
         - "PendingTasks"
         - "TotalBlockedTasks"
 
-    - name: requestmetrics
-      obj: "org.apache.cassandra.metrics:type=*,name=*,"
-      resultAlias: "requestmetrics"
+    - name: readtimeouts
+      obj : "org.apache.cassandra.metrics:name=ReadTimeouts,type=ClientRequestMetrics"
+      resultAlias : "readtimeouts"
+      attr:
+        - "Count"
+
+    - name: readunavailables
+      obj : "org.apache.cassandra.metrics:name=ReadUnavailables,type=ClientRequestMetrics"
+      resultAlias : "readunavailables"
+      attr:
+        - "Count"
+
+    - name: writetimeouts
+      obj : "org.apache.cassandra.metrics:name=WriteTimeouts,type=ClientRequestMetrics"
+      resultAlias : "writetimeouts"
+      attr:
+        - "Count"
+
+    - name: writeunavailables
+      obj : "org.apache.cassandra.metrics:name=WriteUnavailables,type=ClientRequestMetrics"
+      resultAlias : "writeunavailables"
       attr:
         - "Count"
 
@@ -92,47 +115,85 @@ queries:
         - "RecentTotalTimouts"
         - "TotalTimeouts"
 
-    - name: requeststage
-      obj : "org.apache.cassandra.request:type=*"
-      resultAlias : "requeststage"
+    - name: mutationstage
+      obj : "org.apache.cassandra.request:type=MutationStage"
+      resultAlias : "mutationstage"
       attr:
         - "ActiveCount"
         - "CompletedTasks"
+        - "CorePoolSize"
         - "CurrentlyBlockedTasks"
         - "PendingTasks"
         - "TotalBlockedTasks"
 
-
-    - name: columnfamily
-      obj : "org.apache.cassandra.db:type=ColumnFamilies,columnfamily=*,keyspace=*"
-      resultAlias : "columnfamily"
+    - name: readrepairstage
+      obj : "org.apache.cassandra.request:type=ReadRepairStage"
+      resultAlias : "readrepairstage"
       attr:
-        - "BloomFilterDiskSpaceUsed"
-        - "BloomFilterFalsePositives"
-        - "BloomFilterFalseRatio"
-        - "BloomFilterFalseRatio"
-        - "LiveDiskSpaceUsed"
-        - "LiveSSTableCount"
-        - "MaxRowSize"
-        - "MeanRowSize"
-        - "MemtableColumnsCount"
-        - "MemtableDataSize"
-        - "MemtableSwitchCount"
-        - "MinRowSize"
-        - "PendingTasks"
-        - "ReadCount"
-        - "RecentBloomFilterFalsePositives"
-        - "RecentBloomFilterFalseRatio"
-        - "RecentReadLatencyMicros"
-        - "RecentWriteLatencyMicros"
-        - "TotalDiskSpaceUsed"
-        - "TotalReadLatencyMicros"
-        - "TotalWriteLatencyMicros"
-        - "WriteCount"
+         - "ActiveCount"
+         - "CompletedTasks"
+         - "CorePoolSize"
+         - "CurrentlyBlockedTasks"
+         - "PendingTasks"
+         - "TotalBlockedTasks"
 
+    - name: readstage
+      obj : "org.apache.cassandra.request:type=ReadStage"
+      resultAlias : "readstage"
+      attr:
+         - "ActiveCount"
+         - "CompletedTasks"
+         - "CorePoolSize"
+         - "CurrentlyBlockedTasks"
+         - "PendingTasks"
+         - "TotalBlockedTasks"
+
+    - name: replicateonwritestage
+      obj : "org.apache.cassandra.request:type=ReplicateOnWriteStage"
+      resultAlias : "replicateonwritestage"
+      attr:
+         - "ActiveCount"
+         - "CompletedTasks"
+         - "CorePoolSize"
+         - "CurrentlyBlockedTasks"
+         - "PendingTasks"
+         - "TotalBlockedTasks"
+
+    - name: requestresponsestage
+      obj : "org.apache.cassandra.request:type=RequestResponseStage"
+      resultAlias : "requestresponsestage"
+      attr:
+         - "ActiveCount"
+         - "CompletedTasks"
+         - "CorePoolSize"
+         - "CurrentlyBlockedTasks"
+         - "PendingTasks"
+         - "TotalBlockedTasks"
+
+    - name: hintscolumnfamily
+      obj : "org.apache.cassandra.db:columnfamily=HintsColumnFamily,keyspace=system,type=ColumnFamilies"
+      resultAlias : "hintscolumnfamily"
+      attr:
+         - "MaxRowSize"
+         - "MeanRowSize"
+         - "MemtableColumnsCount"
+         - "MemtableDataSize"
+         - "MemtableSwitchCount"
+         - "MinRowSize"
+         - "PendingTasks"
+         - "ReadCount"
+         - "RecentBloomFilterFalsePositives"
+         - "RecentBloomFilterFalseRatio"
+         - "RecentReadLatencyMicros"
+         - "RecentWriteLatencyMicros"
+         - "TotalDiskSpaceUsed"
+         - "TotalReadLatencyMicros"
+         - "TotalWriteLatencyMicros"
+         - "TotalWriteLatencyMicros"
+         - "WriteCount"
 
 sets:
-  - setname: cassandra_jmxtrans
+  - setname: cassandra_jmx
     query_names:
             - mempool
             - gc
@@ -141,11 +202,18 @@ sets:
             - caches
             - commitlog
             - compaction
-            - internalstage
-            - requestmetrics
+            - flushwriter
+            - readtimeouts
+            - readunavailables
+            - writetimeouts
+            - writeunavailables
             - messagingservice
-            - requeststage
-            - columnfamily
+            - mutationstage
+            - readrepairstage
+            - readstage
+            - replicateonwritestage
+            - requestresponsestage
+            - hintscolumnfamily
 
     hosts:
             - 127.0.0.1

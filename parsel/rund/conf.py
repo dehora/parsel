@@ -62,6 +62,8 @@ class Config:
         logger.info("instance-type: %s" % instancetype)
         if instancetype == 'm1.small' or instancetype == 'm1.medium':
             logger.exit_path(self, "m1.small and m1.medium instances too small, must be at least m1.large.", instance_data)
+
+        instance_data['local-ipv4'] = http_get('http://instance-data/latest/meta-data/local-ipv4')
         return instance_data
 
     def set_supplied_userdata(self, options):

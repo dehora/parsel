@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 import time
+import re
+import os
 
 from parsel.rund.conf import Config
 from parsel import logger
 from parsel.rund.raid import RaidInstaller
 from parsel.rund.cassandra import CassandraInstaller
 from parsel.rund.priam import PriamInstaller
+
 
 def restart_tasks(config):
     logger.exe('sudo mount -a')
@@ -15,6 +18,29 @@ def restart_tasks(config):
     if config.get_config('instance', 'raid_readahead'):
         logger.exe('sudo blockdev --setra %s /dev/md0'
                    % (config.get_config('instance', 'raid_readahead')), expectError=True)
+
+
+def configure_jmxtrans(ipaddr):
+    with open('/home/ubuntu/parsel/parsel/ami/cassandra_jmxtrans.json', 'r') as f:
+        json = f.read()
+    # todo: fragile
+    p = re.compile('"127.0.0.1"')
+    json = p.sub('"{0}"'.format(ipaddr), json)
+    with open(os.path.join('/var/lib/jmxtrans/', 'cassandra_jmxtrans.json'), 'w') as f:
+        f.write(json)
+    logger.info('cassandra_jmxtrans.json configured with %s as source host.' % (ipaddr,))
+    logger.exe("sudo /etc/init.d/jmxtrans stop")
+    time.sleep(8)  # jmxtrans can take a few seconds to stop
+    logger.exe("sudo /etc/init.d/jmxtrans start")
+    logger.info('jmxtrans restarted.')
+
+
+def fixup_diamond():
+    # fixup for diamond's broken deb file
+    logger.exe("sudo mkdir -p /var/run/diamond")
+    logger.exe("sudo /etc/init.d/diamond stop")
+    time.sleep(4)
+    logger.exe("sudo /etc/init.d/diamond start")
 
 
 def run():
@@ -83,11 +109,8 @@ def run():
 
             logger.info("Permissions completed!\n")
 
-            # fixup for diamond's broken deb file
-            logger.exe("sudo mkdir -p /var/run/diamond")
-            logger.exe("sudo /etc/init.d/diamond stop")
-            time.sleep(8)
-            logger.exe("sudo /etc/init.d/diamond start")
+            configure_jmxtrans(instance_data['local-ipv4'])
+            fixup_diamond()
 
             config.set_config("instance", "perms", "completed")
         else:
