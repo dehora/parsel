@@ -1,7 +1,7 @@
 {
  "servers": [
   {
-   "numQueryThreads": 12, 
+   "numQueryThreads": 19, 
    "host": "127.0.0.1", 
    "port": 7199, 
    "queries": [
@@ -176,8 +176,8 @@
        }
       }
      ], 
-     "resultAlias": "internalstage", 
-     "obj": "org.apache.cassandra.internal:type=*", 
+     "resultAlias": "flushwriter", 
+     "obj": "org.apache.cassandra.internal:type=FlushWriter", 
      "attr": [
       "ActiveCount", 
       "CompletedTasks", 
@@ -199,8 +199,65 @@
        }
       }
      ], 
-     "resultAlias": "requestmetrics", 
-     "obj": "org.apache.cassandra.metrics:type=*,name=*,", 
+     "resultAlias": "readtimeouts", 
+     "obj": "org.apache.cassandra.metrics:name=ReadTimeouts,type=ClientRequestMetrics", 
+     "attr": [
+      "Count"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "readunavailables", 
+     "obj": "org.apache.cassandra.metrics:name=ReadUnavailables,type=ClientRequestMetrics", 
+     "attr": [
+      "Count"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "writetimeouts", 
+     "obj": "org.apache.cassandra.metrics:name=WriteTimeouts,type=ClientRequestMetrics", 
+     "attr": [
+      "Count"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "writeunavailables", 
+     "obj": "org.apache.cassandra.metrics:name=WriteUnavailables,type=ClientRequestMetrics", 
      "attr": [
       "Count"
      ]
@@ -238,11 +295,12 @@
        }
       }
      ], 
-     "resultAlias": "requeststage", 
-     "obj": "org.apache.cassandra.request:type=*", 
+     "resultAlias": "mutationstage", 
+     "obj": "org.apache.cassandra.request:type=MutationStage", 
      "attr": [
       "ActiveCount", 
       "CompletedTasks", 
+      "CorePoolSize", 
       "CurrentlyBlockedTasks", 
       "PendingTasks", 
       "TotalBlockedTasks"
@@ -261,15 +319,105 @@
        }
       }
      ], 
-     "resultAlias": "columnfamily", 
-     "obj": "org.apache.cassandra.db:type=ColumnFamilies,columnfamily=*,keyspace=*", 
+     "resultAlias": "readrepairstage", 
+     "obj": "org.apache.cassandra.request:type=ReadRepairStage", 
      "attr": [
-      "BloomFilterDiskSpaceUsed", 
-      "BloomFilterFalsePositives", 
-      "BloomFilterFalseRatio", 
-      "BloomFilterFalseRatio", 
-      "LiveDiskSpaceUsed", 
-      "LiveSSTableCount", 
+      "ActiveCount", 
+      "CompletedTasks", 
+      "CorePoolSize", 
+      "CurrentlyBlockedTasks", 
+      "PendingTasks", 
+      "TotalBlockedTasks"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "readstage", 
+     "obj": "org.apache.cassandra.request:type=ReadStage", 
+     "attr": [
+      "ActiveCount", 
+      "CompletedTasks", 
+      "CorePoolSize", 
+      "CurrentlyBlockedTasks", 
+      "PendingTasks", 
+      "TotalBlockedTasks"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "replicateonwritestage", 
+     "obj": "org.apache.cassandra.request:type=ReplicateOnWriteStage", 
+     "attr": [
+      "ActiveCount", 
+      "CompletedTasks", 
+      "CorePoolSize", 
+      "CurrentlyBlockedTasks", 
+      "PendingTasks", 
+      "TotalBlockedTasks"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "requestresponsestage", 
+     "obj": "org.apache.cassandra.request:type=RequestResponseStage", 
+     "attr": [
+      "ActiveCount", 
+      "CompletedTasks", 
+      "CorePoolSize", 
+      "CurrentlyBlockedTasks", 
+      "PendingTasks", 
+      "TotalBlockedTasks"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "hintscolumnfamily", 
+     "obj": "org.apache.cassandra.db:columnfamily=HintsColumnFamily,keyspace=system,type=ColumnFamilies", 
+     "attr": [
       "MaxRowSize", 
       "MeanRowSize", 
       "MemtableColumnsCount", 
@@ -284,6 +432,7 @@
       "RecentWriteLatencyMicros", 
       "TotalDiskSpaceUsed", 
       "TotalReadLatencyMicros", 
+      "TotalWriteLatencyMicros", 
       "TotalWriteLatencyMicros", 
       "WriteCount"
      ]

@@ -193,7 +193,7 @@ queries:
          - "WriteCount"
 
 sets:
-  - setname: cassandra_jmx
+  - setname: cassandra_jmxtrans
     query_names:
             - mempool
             - gc
