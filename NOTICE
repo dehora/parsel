@@ -11,4 +11,5 @@ with following notice -
 
 This product uses code from the jmxtrans project
 (see https://github.com/jmxtrans/jmxtrans), which was released
-under the MIT License.
+under the MIT License. The file used is released under the ASF2
+license.
