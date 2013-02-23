@@ -173,7 +173,6 @@ def install_jmxtrans():
     exe('sudo wget https://viscis-archive.s3.amazonaws.com/jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
     exe('sudo dpkg -i jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
     exe('sudo rm jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
-    exe('sudo cp /home/ubuntu/parsel/parsel/ami/cassandra_jmxtrans.json /var/lib/jmxtrans/')
 
 
 def setup_profiles():
