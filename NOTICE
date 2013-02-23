@@ -8,3 +8,7 @@ with following notice -
 
   Feel free to fork off this project and offer
   any suggestions that you find along the way.
+
+This product uses code from the jmxtrans project
+(see https://github.com/jmxtrans/jmxtrans), which was released
+under the MIT License.
