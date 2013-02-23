@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import time
+
 from parsel.rund.conf import Config
 from parsel import logger
 from parsel.rund.raid import RaidInstaller
@@ -80,6 +82,13 @@ def run():
             logger.exe("sudo adduser cassandra sudo")
 
             logger.info("Permissions completed!\n")
+
+            # fixup for diamond's broken deb file
+            logger.exe("sudo mkdir -p /var/run/diamond")
+            logger.exe("sudo /etc/init.d/diamond stop")
+            time.sleep(8)
+            logger.exe("sudo /etc/init.d/diamond start")
+
             config.set_config("instance", "perms", "completed")
         else:
             logger.info('Permissions configuration logged as completed, skipping.')
