@@ -213,21 +213,18 @@ print "Image Configured."
 def main(argv=None):
     parser = OptionParser(usage="""
 
-    instance COMMAND [options]
+    prepare_ami [options]
 
 Prepare a Cassandra AMI.
 
-Commands:
-    prepare     Prepare the instance
+options:
+    j, jmxtrans     [true],false: install jmxtrans
     """)
-    prepare_group = OptionGroup(parser, "prepare", "Prepare the instance")
-
     parser.add_option(
         '-j', '--jmxtrans', metavar="JMXTRANS", nargs=1, action='store', dest='jmxtrans', default=True,
-        help="Install jmxtrans (default is to install).")
+        help="Install jmxtrans (default true).")
     (options, args) = parser.parse_args()
-    # prepare(options.jmxtrans)
-    print options
+    prepare(options.jmxtrans)
 
 
 if __name__ == "__main__":
