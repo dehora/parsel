@@ -2,6 +2,8 @@
 
 import time
 import os
+import sys
+from optparse import OptionParser, OptionGroup
 
 from parsel.ntp import TimeInstaller
 from parsel.logger import exe
@@ -185,20 +187,48 @@ export JAVA_HOME=/opt/java/64/jdk1.6.0_38
 export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
 """)
 
-update_distro()
-setup_parsel_logging()
-TimeInstaller().setup_ntp()
-install_java()
-install_packages()
-setup_profiles()
-boostrap_maven()
-boostrap_cassandra_libs()
-setup_limits_conf()
-install_initd()
-evil_priam_auth()
-install_tomcat()
-exe('sudo service tomcat7 stop')
-install_jmxtrans()
-cleandown_instance()
+
+def prepare(jmxtrans=True):
+    update_distro()
+    setup_parsel_logging()
+    TimeInstaller().setup_ntp()
+    install_java()
+    install_packages()
+    setup_profiles()
+    boostrap_maven()
+    boostrap_cassandra_libs()
+    setup_limits_conf()
+    install_initd()
+    evil_priam_auth()
+    install_tomcat()
+    exe('sudo service tomcat7 stop')
+    if jmxtrans:
+        install_jmxtrans()
+    cleandown_instance()
 
 print "Image Configured."
+
+
+# noinspection PyUnusedLocal
+def main(argv=None):
+    parser = OptionParser(usage="""
+
+    instance COMMAND [options]
+
+Prepare a Cassandra AMI.
+
+Commands:
+    prepare     Prepare the instance
+    """)
+    prepare_group = OptionGroup(parser, "prepare", "Prepare the instance")
+
+    parser.add_option(
+        '-j', '--jmxtrans', metavar="JMXTRANS", nargs=1, action='store', dest='jmxtrans', default=True,
+        help="Install jmxtrans (default is to install).")
+    (options, args) = parser.parse_args()
+    # prepare(options.jmxtrans)
+    print options
+
+
+if __name__ == "__main__":
+    sys.exit(main())
