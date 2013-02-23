@@ -7,9 +7,12 @@ quotes = ["How's that for a slice of fried gold?",
           "Wait for all of this to blow over.",
           "Okay. But dogs _can_ look up.",
           "Vacant, with a hint of sadness.",
+          "You've got red on you.",
+          "I will repeat that: by removing the head or destroying the brain.",
           "It's not hip hop, it's electro.",
           "Player 2 has entered the game.",
           "The zed-word. Don't say it!",
+          "Cornetto.",
           "That is really going to exacerbate things for all of us."]
 
 
