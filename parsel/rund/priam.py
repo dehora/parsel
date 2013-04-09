@@ -1,8 +1,7 @@
 from parsel import logger
 from parsel.rund.conf import Config
 
-default_version = "1.1.19-euwest-0.0.5"
-default_bucket = "https://viscis-archive.s3.amazonaws.com"
+
 default_tomcat = "/var/lib/tomcat7/webapps"
 
 
@@ -10,30 +9,42 @@ class PriamInstaller:
     def __init__(self):
         pass
 
-    def install(self, config, bucket=default_bucket, version=default_version, tomcat=default_tomcat):
-        if config.get_config("instance", "priam_configuration") != "completed":
-            self.install_s3cmd()
+    def install(self,
+                config,
+                priam_agent_jar_url,
+                priam_agent_jar_filename,
+                priam_war_url,
+                priam_war_filename,
+                tomcat=default_tomcat):
+
+        if config.get_config("priam", "priam_configuration") != "completed":
             logger.exe("sudo service tomcat7 stop")
-            self.install_priam(bucket, version, tomcat)
-            config.set_config("instance", "priam_configuration", "completed")
+            self.install_priam(priam_agent_jar_url, priam_agent_jar_filename, priam_war_url, priam_war_filename, tomcat)
+            config.set_config("priam", "priam_configuration", "completed")
         else:
             logger.info('PriamInstaller logged as completed, skipping.')
 
-    def install_priam(self, bucket, version, tomcat):
-        logger.exe('sudo wget --no-check-certificate %s/priam-cass-extensions-%s.jar' % (bucket, version,))
-        logger.exe('sudo mv priam-cass-extensions-%s.jar /usr/share/cassandra/lib/' % (version,))
-        with open('/etc/cassandra/cassandra-env.sh', 'a') as f:
-            f.write('JVM_OPTS="$JVM_OPTS -javaagent:/usr/share/cassandra/lib/priam-cass-extensions-%s.jar"\n'
-                    % (version,))
-        logger.exe('sudo wget --no-check-certificate %s/priam-web-%s.war' % (bucket, version,))
-        # the agent is looking for "/Priam/" in the uri
-        logger.exe('sudo mv priam-web-%s.war %s/Priam.war' % (version, tomcat,))
+    def install_priam(self,
+                      priam_agent_jar_url,
+                      priam_agent_jar_filename,
+                      priam_war_url,
+                      priam_war_filename,
+                      tomcat):
 
-    def install_s3cmd(self):
-        while True:
-            output = logger.exe('sudo apt-get -y install s3cmd')
-            if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
-                break
+        logger.exe('sudo wget --no-check-certificate --output-document %s %s'
+                   % (priam_agent_jar_filename, priam_agent_jar_url,))
+
+        logger.exe('sudo mv %s /usr/share/cassandra/lib/' % (priam_agent_jar_filename,))
+
+        with open('/etc/cassandra/cassandra-env.sh', 'a') as f:
+            f.write('JVM_OPTS="$JVM_OPTS -javaagent:/usr/share/cassandra/lib/%s"\n'
+                    % (priam_agent_jar_filename,))
+
+        logger.exe('sudo wget --no-check-certificate --output-document %s %s'
+                   % (priam_war_filename, priam_war_url,))
+
+        # the agent is looking for "/Priam/" in the uri
+        logger.exe('sudo mv %s %s/Priam.war' % (priam_war_filename, tomcat,))
 
 
 if __name__ == "__main__":
@@ -42,4 +53,3 @@ if __name__ == "__main__":
     options = config.parse_supplied_userdata(instance_data)
     config.set_supplied_userdata(options)
     priam = PriamInstaller()
-    priam.install(config)

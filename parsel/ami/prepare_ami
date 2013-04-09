@@ -3,75 +3,104 @@
 import time
 import os
 import sys
-from optparse import OptionParser, OptionGroup
+from optparse import OptionParser
 
 from parsel.ntp import TimeInstaller
-from parsel.logger import exe
-from parsel.logger import pipe
+from parsel.logger import pipe, info
+from fabric.api import local, settings, abort
+from fabric.contrib.console import confirm
 
 # Based on ComboAMI, see https://github.com/riptano/ComboAMI
+
+JAVA_BASE = "/opt/java/64"
 
 
 def update_distro():
     pipe('echo "deb http://archive.canonical.com/ precise partner"',
          'sudo tee -a /etc/apt/sources.list.d/java.sources.list')
-    exe('sudo apt-get -y update')
+    local('sudo apt-get -y update')
     time.sleep(10)
-    exe('sudo apt-get -y update')
+    local('sudo apt-get -y update')
 
 
 def install_packages():
-    while True:
-        output = exe(
-            'sudo apt-get -y install --fix-missing libjna-java htop emacs23-nox sysstat iftop binutils pssh pbzip2 xfsprogs zip unzip ruby openssl libopenssl-ruby curl maven2 ant liblzo2-dev ntp subversion python-pip tree unzip ruby xfsprogs')
-        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
-            break
 
-    while True:
-        output = exe(
-            'sudo apt-get -y install acl policykit-1 ca-certificates-java icedtea-6-jre-cacao java-common jsvc libavahi-client3 libavahi-common-data libavahi-common3 libcommons-daemon-java libcups2 libjna-java libjpeg62 liblcms1 libnspr4-0d libnss3-1d tzdata-java')
-        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
-            break
+    for package in ["libjna-java",
+                    "htop",
+                    "emacs23-nox",
+                    "sysstat",
+                    "sysstat",
+                    "iftop",
+                    "binutils",
+                    "pssh",
+                    "pbzip2",
+                    "xfsprogs",
+                    "zip",
+                    "unzip",
+                    "ruby",
+                    "openssl",
+                    "libopenssl-ruby",
+                    "curl",
+                    "maven2",
+                    "ant",
+                    "liblzo2-dev",
+                    "ntp",
+                    "subversion",
+                    "python-pip",
+                    "tree"]:
+        with settings(warn_only=True):
+            result = local("sudo apt-get -y install --fix-missing %s" % package)
+        if result.failed and not confirm("apt-get %s failed. Continue anyway?" % package):
+            abort("Failing on %s" % package)
 
-    while True:
-        output = exe('sudo apt-get -y --no-install-recommends install mdadm')
-        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
-            break
+    for package in ["acl",
+                    "policykit-1",
+                    "ca-certificates-java",
+                    "icedtea-6-jre-cacao",
+                    "java-common",
+                    "jsvc",
+                    "libavahi-client3",
+                    "libavahi-common-data",
+                    "libavahi-common3",
+                    "libcommons-daemon-java",
+                    "libcups2",
+                    "libjna-java",
+                    "libjpeg62",
+                    "liblcms1",
+                    "libnspr4-0d",
+                    "libnss3-1d",
+                    "tzdata-java"]:
+        with settings(warn_only=True):
+            result = local("sudo apt-get -y install  %s" % package)
+        if result.failed and not confirm("apt-get %s failed. Continue anyway?" % package):
+            abort("Failing on %s" % package)
+
+    for package in ["mdadm"]:
+        with settings(warn_only=True):
+            result = local("sudo apt-get -y --no-install-recommends install  %s" % package)
+        if result.failed and not confirm("apt-get %s failed. Continue anyway?" % package):
+            abort("Failing on %s" % package)
 
 
-def boostrap_maven():
-    # dummy op to boostrap mvn, we expect this to fail (no pom found)
-    exe('sudo -u ubuntu mvn install')
-    time.sleep(5)
-
-
-def boostrap_cassandra_libs():
-    # put the c* libs into .m2
-    home_path = os.getcwd()
-    exe('git clone https://github.com/apache/cassandra.git')
-    os.chdir('cassandra')
-    exe('ant')
-    os.chdir(home_path)
-    exe('rm -rf cassandra/')
-
-
-def install_java():
+def install_java6(java6_uri, java_bin, java_version):
+    java_home = "%s/%s" % (JAVA_BASE, java_version)
     home_path = '/home/ubuntu/parsel/parsel/ami'
-    exe('sudo wget https://viscis-archive.s3.amazonaws.com/jdk-6u38-linux-x64.bin')
-    exe('sudo mkdir -p /opt/java/64')
-    exe('sudo mv jdk-6u38-linux-x64.bin /opt/java/64/')
-    os.chdir('/opt/java/64/')
-    exe('sudo chmod +x jdk-6u38-linux-x64.bin')
-    exe('echo "Installing Java, this can take a while."')
-    exe('sudo ./jdk-6u38-linux-x64.bin')
-    exe('sudo update-alternatives --install "/usr/bin/java" "java" "/opt/java/64/jdk1.6.0_38/bin/java" 1')
-    exe('sudo update-alternatives --set java /opt/java/64/jdk1.6.0_38/bin/java')
+    local('sudo wget %s' % (java6_uri, ))
+    local('sudo mkdir -p %s' % (JAVA_BASE, ))
+    local('sudo mv %s %s' % (java_bin, JAVA_BASE, ))
+    os.chdir(JAVA_BASE)
+    local('sudo chmod +x %s' % (java_bin, ))
+    local('echo "Installing Java, this can take a while."')
+    local('sudo ./%s' % (java_bin,))
+    local('sudo update-alternatives --install "/usr/bin/java" "java" "%s/bin/java" 1' % (java_home,))
+    local('sudo update-alternatives --set java %s/bin/java' % (java_home,))
     os.chdir(home_path)
+    return java_home
 
 
 def setup_profiles():
     profile = '/home/ubuntu/.profile'
-    exe('sudo chmod 777 ' + profile)
+    local('sudo chmod 777 ' + profile)
     with open(profile, 'a') as f:
         f.write("""
 
@@ -79,30 +108,30 @@ python parsel/parsel/rund/motd.py
 export JAVA_HOME=/opt/java/64/jdk1.6.0_38
 export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
 """)
-    exe('sudo chmod 644 ' + profile)
+    local('sudo chmod 644 ' + profile)
 
     bashrc = '/home/ubuntu/.bashrc'
-    exe('sudo chmod 777 ' + bashrc)
+    local('sudo chmod 777 ' + bashrc)
     with open(bashrc, 'a') as f:
         f.write("""
 
 export JAVA_HOME=/opt/java/64/jdk1.6.0_38
 export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
 """)
-    exe('sudo chmod 644 ' + bashrc)
-    exe('sudo chmod 777 /root/.profile')
-    exe('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.profile')
-    exe('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.profile')
-    exe('sudo chmod 644 /root/.profile')
-    exe('sudo chmod 777 /root/.bashrc')
-    exe('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.bashrc')
-    exe('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.bashrc')
-    exe('sudo chmod 644 /root/.bashrc')
+    local('sudo chmod 644 ' + bashrc)
+    local('sudo chmod 777 /root/.profile')
+    local('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.profile')
+    local('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.profile')
+    local('sudo chmod 644 /root/.profile')
+    local('sudo chmod 777 /root/.bashrc')
+    local('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.bashrc')
+    local('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.bashrc')
+    local('sudo chmod 644 /root/.bashrc')
 
     os.chdir('/home/ubuntu')
 
 
-def install_initd():
+def install_initd(java_home):
     initscript = """#!/bin/sh
 
 ### BEGIN INIT INFO
@@ -115,7 +144,7 @@ def install_initd():
 # Description:       Enables AMI Configurations on startup.
 ### END INIT INFO
 
-export JAVA_HOME=/opt/java/64/jdk1.6.0_38
+export JAVA_HOME=%s
 export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
 sudo su -c 'ulimit -n 32768'
 sudo mkdir -p /etc/parsel
@@ -124,16 +153,16 @@ sudo touch /etc/parsel/parsel.conf
 sudo chown -R ubuntu:ubuntu /etc/parsel
 sudo chown -R ubuntu:ubuntu /var/log/parsel
 echo 1 | sudo tee /proc/sys/vm/overcommit_memory
-echo "\n$(date +\%Y-\%m-\%d-\%H\%M\%S) -------------------------------------\n" >> /var/log/parsel/parsel.log
+echo "\n$(date %s) -------------------------------------\n" >> /var/log/parsel/parsel.log
 cd /home/ubuntu/parsel/parsel/rund
-python initd_configure.py"""
+python initd_configure.py""" % (java_home, "+\%Y-\%m-\%d-\%H\%M\%S")
 
-    exe('sudo touch /etc/init.d/init-cassandra.sh')
-    exe('sudo chmod 777 /etc/init.d/init-cassandra.sh')
-    with open('/etc/init.d/init-cassandra.sh', 'w') as f:
+    local('sudo touch /etc/init.d/init-parsel.sh')
+    local('sudo chmod 777 /etc/init.d/init-parsel.sh')
+    with open('/etc/init.d/init-parsel.sh', 'w') as f:
         f.write(initscript)
-    exe('sudo chmod 755 /etc/init.d/init-cassandra.sh')
-    exe('sudo update-rc.d -f init-cassandra.sh start 99 2 3 4 5 .')
+    local('sudo chmod 755 /etc/init.d/init-parsel.sh')
+    local('sudo update-rc.d -f init-parsel.sh start 99 2 3 4 5 .')
 
 
 def setup_limits_conf():
@@ -144,65 +173,86 @@ def setup_limits_conf():
 
 
 def cleandown_instance():
-    exe('sudo rm .ssh/authorized_keys')
-    exe("sudo rm -rf /etc/ssh/ssh_host_dsa_key*", shellEnabled=True)
-    exe("sudo rm -rf /etc/ssh/ssh_host_key*", shellEnabled=True)
-    exe("sudo rm -rf /etc/ssh/ssh_host_rsa_key*", shellEnabled=True)
-    exe("sudo rm -rf /tmp/*", shellEnabled=True)
-    exe("sudo rm -rf /tmp/.*", shellEnabled=True)
-    exe('rm -rf ~/.bash_history && history -c')
+    local('sudo rm .ssh/authorized_keys')
+    local("sudo rm -rf /etc/ssh/ssh_host_dsa_key*")
+    local("sudo rm -rf /etc/ssh/ssh_host_key*")
+    local("sudo rm -rf /etc/ssh/ssh_host_rsa_key*")
+    local("sudo rm -rf /tmp/*")
+    local("sudo rm -rf /tmp/.*")
+    local('rm -rf ~/.bash_history && history -c')
 
 
 def evil_priam_auth():
-    exe("sudo mv /home/ubuntu/awscredential.properties /etc", shellEnabled=True)
+    local("sudo mv /home/ubuntu/awscredential.properties /etc")
 
 
 def install_tomcat():
-    while True:
-        output = exe('sudo apt-get -y install tomcat7')
-        if not output[1] and not 'err' in output[0].lower() and not 'failed' in output[0].lower():
-            break
+    local('sudo apt-get -y install tomcat7')
 
 
-def setup_parsel_logging():
-    exe("sudo mkdir -p /var/log/parsel", shellEnabled=True)
-    exe("sudo chown -hR ubuntu:ubuntu /var/log/parsel", shellEnabled=True)
+def setup_logging():
+    local("sudo mkdir -p /var/log/parsel")
+    local("sudo chown -hR ubuntu:ubuntu /var/log/parsel")
 
 
-def install_jmxtrans():
-    exe('sudo wget https://viscis-archive.s3.amazonaws.com/jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
-    exe('sudo dpkg -i jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
-    exe('sudo rm jmxtrans_20121016-175251-ab6cfd36e3-1_all.deb')
+def install_jmxtrans(jmxtrans_deb_uri, jmxtrans_deb_file):
+    local('sudo wget %s' % jmxtrans_deb_uri)
+    local('sudo dpkg -i %s' % jmxtrans_deb_file)
+    local('sudo rm %s' % jmxtrans_deb_file)
 
 
-def setup_profiles():
+def setup_profiles(java_home):
     profile = '/home/ubuntu/.profile'
-    exe('sudo chmod 777 ' + profile)
+    local('sudo chmod 777 ' + profile)
     with open(profile, 'a') as f:
         f.write("""
 
 python parsel/parsel/rund/motd.py
-export JAVA_HOME=/opt/java/64/jdk1.6.0_38
+export JAVA_HOME=%s
 export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
-""")
+""" % (java_home,))
+
+    local('sudo chmod 644 ' + profile)
+    bashrc = '/home/ubuntu/.bashrc'
+    local('sudo chmod 777 ' + bashrc)
+    with open(bashrc, 'a') as f:
+        f.write("""
+
+export JAVA_HOME=%s
+export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
+""" % (java_home,))
+    local('sudo chmod 644 ' + bashrc)
+    local('sudo chmod 777 /root/.profile')
+    local('sudo echo "JAVA_HOME=%s" >> /root/.profile' % (java_home,))
+    local('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.profile')
+    local('sudo chmod 644 /root/.profile')
+    local('sudo chmod 777 /root/.bashrc')
+    local('sudo echo "JAVA_HOME=%s" >> /root/.bashrc' % (java_home,))
+    local('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.bashrc')
+    local('sudo chmod 644 /root/.bashrc')
+    os.chdir('/home/ubuntu')
 
 
-def prepare(jmxtrans=True):
+def prepare(jmxtrans_deb_uri, jmxtrans_deb_file, java6_uri, java_bin, java_version, jmxtrans=True):
+    setup_logging()
+    info("jmxtrans: %s" % jmxtrans)
+    info("jmxtrans_deb_uri: %s" % jmxtrans_deb_uri)
+    info("jmxtrans_deb_file: %s" % jmxtrans_deb_file)
+    info("java6_uri: %s" % java6_uri)
+    info("java_bin: %s" % java_bin)
+    info("java_version: %s" % java_version)
     update_distro()
-    setup_parsel_logging()
     TimeInstaller().setup_ntp()
-    install_java()
+    java_home = install_java6(java6_uri, java_bin, java_version)
     install_packages()
-    setup_profiles()
-    boostrap_maven()
-    boostrap_cassandra_libs()
+    setup_profiles(java_home)
     setup_limits_conf()
-    install_initd()
+    install_initd(java_home)
     evil_priam_auth()
     install_tomcat()
-    exe('sudo service tomcat7 stop')
+    local('sudo service tomcat7 stop')
     if jmxtrans:
-        install_jmxtrans()
+        install_jmxtrans(jmxtrans_deb_uri, jmxtrans_deb_file)
     cleandown_instance()
     print "Image Configured."
 
@@ -221,9 +271,30 @@ options:
     parser.add_option(
         '-j', '--jmxtrans', metavar="JMXTRANS", nargs=1, action='store', dest='jmxtrans', default=True,
         help="Install jmxtrans (default true).")
+    parser.add_option(
+        '-k', '--jmxtrans_deb_uri', metavar="JMXTRANSDEB", nargs=1, action='store', dest='jmxtrans_deb_uri',
+        default=True, help="URL to jmxtrans deb.")
+    parser.add_option(
+        '-l', '--jmxtrans_deb_file', metavar="JMXTRANSFILE", nargs=1, action='store', dest='jmxtrans_deb_file',
+        help="File name of jmxtrans deb.")
+    parser.add_option(
+        '-m', '--java6_uri', metavar="JAVA6URI", nargs=1, action='store', dest='java6_uri',
+        help="URL to Java 6.")
+    parser.add_option(
+        '-n', '--java_bin', metavar="JAVA6URI", nargs=1, action='store', dest='java_bin',
+        help="Java bin name for Java 6.")
+    parser.add_option(
+        '-o', '--java_version', metavar="JAVA6V", nargs=1, action='store', dest='java_version',
+        help="Java version name for Java 6.")
+
     (options, args) = parser.parse_args()
-    prepare(options.jmxtrans)
-
-
+    prepare(
+        jmxtrans=options.jmxtrans,
+        jmxtrans_deb_uri=options.jmxtrans_deb_uri,
+        jmxtrans_deb_file=options.jmxtrans_deb_file,
+        java6_uri=options.java6_uri,
+        java_bin=options.java_bin,
+        java_version=options.java_version
+    )
 if __name__ == "__main__":
     sys.exit(main())

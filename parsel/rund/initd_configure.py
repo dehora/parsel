@@ -46,13 +46,17 @@ def fixup_diamond():
 def run():
     config = Config()
     if config.get_config("instance", "initial_configuration") != "completed":
-
         instance_data = config.get_instance_data()
         options = config.parse_supplied_userdata(instance_data)
         config.set_supplied_userdata(options)
         RaidInstaller().install(config)
-        CassandraInstaller().install(config, options)
-        PriamInstaller().install(config)
+        CassandraInstaller().install(config, options.release)
+        PriamInstaller().install(
+            config,
+            options.priam_agent_jar_url,
+            options.priam_agent_jar_filename,
+            options.priam_war_url,
+            options.priam_war_filename)
 
         if config.get_config("instance", "perms") != "completed":
             # let priam find yaml
