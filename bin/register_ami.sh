@@ -1,6 +1,7 @@
 AWSID=$1
 AWS_ACCESS_KEY=$2
 AWS_SECRET_KEY=$3
+AMI_BUCKET=$4
 
 sudo rm /var/log/parsel/parsel.log
 sudo mv /home/ubuntu/*.pem /mnt
@@ -10,7 +11,7 @@ PK_PEM=/mnt/pk-*.pem
 VERSION=$(head -1 /home/ubuntu/parsel/version)
 AMINAME=cassandra_ami_$VERSION
 MANIFEST=/mnt/$AMINAME.manifest.xml
-S3BUCKET=viscis-machine
+S3BUCKET=$AMI_BUCKET
 
 rm -rf ~/.bash_history
 history -c
