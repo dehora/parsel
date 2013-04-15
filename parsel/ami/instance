@@ -9,6 +9,8 @@ from parsel.sftp import create_sftp
 import boto
 import boto.ec2
 
+baker = "CassandraBaker"
+
 
 def _get_region(zone):
     return zone[:-1]
@@ -25,7 +27,8 @@ def start(max_count,
           baking_cert_file_name,
           baking_pk_file_name,
           parsel_dir,
-          pem_dir):
+          pem_dir,
+          upwait=30):
     max_count = int(max_count)
     if not os.path.isfile(ssh_key_file_path):
         print 'No such key file %s' % ssh_key_file_path
@@ -56,8 +59,12 @@ def start(max_count,
         instance_ids.append(instance.id)
 
         print 'Instance %s, %s, %s created.' % (instance.id, instance.public_dns_name, instance.ip_address,)
-        print 'Will begin uploading parsel in 30s'
-        time.sleep(30)
+        print "\nInstance ssh string follows:"
+        print '  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i %s -l %s %s \n' % (
+            os.path.join(ssh_key_file_path), ssh_username, instance.ip_address,)
+
+        print 'Will begin uploading parsel in %ds' % upwait
+        time.sleep(upwait)
 
         host = instance.public_dns_name
         sftp = create_sftp(host, ssh_username, ssh_key_file_path)
@@ -70,15 +77,12 @@ def start(max_count,
         upload_parsel(sftp, parsel_dir, "/home/ubuntu")
         print "...Uploading parsel done."
 
-        print "Uploading awscredential.properties file for Priam until we get IAM creds setup. Pure evil."
+        print "Uploading awscredential.properties file for Priam until we get IAM creds setup. Evil."
         put(sftp, os.path.join(pem_dir, "awscredential.properties"), "awscredential.properties")
+        print "...Uploading creds done."
 
-        print "\nInstance creation complete, ssh string follows:"
-        print '  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i %s -l %s %s \n' % (
-            os.path.join(ssh_key_file_path), ssh_username, instance.ip_address,)
-
-    ec2.create_tags(instance_ids, {"baker": "CassandraBaker"})
-    print """Finished. All instances tagged as 'baker':'CassandraBaker'"""
+    ec2.create_tags(instance_ids, {"baker": "%s" % (baker, )})
+    print """Finished. All instances tagged as 'baker':'%s'""" % (baker, )
 
 
 def upload_credentials(sftp, pem_home, baking_pk_file_name, baking_cert_file_name):
@@ -115,7 +119,7 @@ def terminate(region):
     reservations = ec2.get_all_instances()
     for reservation in reservations:
         ri = reservation.instances
-        if 'baker' in ri[0].tags and ri[0].tags['baker'] == 'CassandraBaker' and ri[0].update() == 'running':
+        if 'baker' in ri[0].tags and ri[0].tags['baker'] == '%s' % (baker, ) and ri[0].update() == 'running':
             print "found reservation", reservation
             for instance in reservation.instances:
                 print 'Killing instance in %s, %s, %s, %s ...' % (
@@ -173,6 +177,9 @@ Commands:
     start_group.add_option(
         '-e', '--pem-dir', metavar="PEMD", nargs=1, action='store', dest='pem_dir', type='string',
         help="Location of the pem files.")
+    start_group.add_option(
+        '-f', '--upload-wait', metavar="UPWAIT", nargs=1, action='store', dest='upwait', type='string',
+        default="60", help="How to long wait to start uploading.")
 
     parser.add_option_group(start_group)
 
@@ -210,7 +217,8 @@ Commands:
               options.baking_cert_file_name,
               options.baking_pk_file_name,
               options.parsel_dir,
-              options.pem_dir)
+              options.pem_dir,
+              int(options.upwait))
 
     if command == 'terminate':
         if not options.region:
