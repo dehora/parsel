@@ -17,7 +17,7 @@ quotes = ["How's that for a slice of fried gold?",
 
 
 def nodetool_ring():
-    print "Cluster status..."
+    print "Asking nodetool for cluster status..."
     print
     p1 = subprocess.Popen(["nodetool", "ring"], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=False)
     p1.wait()
@@ -27,7 +27,7 @@ def nodetool_ring():
 
 
 def nodetool_info():
-    print "Local info..."
+    print "Asking nodetool for node info..."
     print
     p1 = subprocess.Popen(["nodetool", "info"], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=False)
     p1.wait()
