@@ -197,7 +197,7 @@ def setup_logging():
 
 def install_jmxtrans(jmxtrans_deb_uri, jmxtrans_deb_file):
     local('sudo wget %s' % jmxtrans_deb_uri)
-    local('sudo dpkg -o DPkg::Options::="--force-confold" -i %s' % jmxtrans_deb_file)
+    local('sudo dpkg -i %s' % jmxtrans_deb_file)
     local('sudo rm %s' % jmxtrans_deb_file)
 
 
