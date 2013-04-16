@@ -9,7 +9,7 @@ sudo mv /home/ubuntu/*.pem /mnt
 CERT_PEM=/mnt/cert-*.pem
 PK_PEM=/mnt/pk-*.pem
 VERSION=$(head -1 /home/ubuntu/parsel/version)
-AMINAME=cassandra_ami_$VERSION
+AMINAME=cassandra_priam_ami_$VERSION
 MANIFEST=/mnt/$AMINAME.manifest.xml
 S3BUCKET=$AMI_BUCKET
 

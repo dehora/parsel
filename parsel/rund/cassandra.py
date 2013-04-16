@@ -11,17 +11,18 @@ class CassandraInstaller:
     def __init__(self):
         pass
 
-    def install(self, config, options):
+    def install(self, config, release):
         if config.get_config("instance", "cassandra_configuration") != "completed":
-            if options.release and options.release.startswith('dsc'):
+            if release.startswith('dsc'):
                 repo.install_datastax_debian_repos(config)
-                self.install_cassandra_datastax(config, options)
-            elif options.release and options.release.startswith('asf'):
-                cass_release = options.release[3:]
+                self.install_cassandra_datastax(config, release)
+            elif release.startswith('asf'):
+                cass_release = release[3:]
                 repo.install_apache_debian_repos(config, cass_release)
-                self.install_cassandra_apache(config, options.release)
+                self.install_cassandra_apache(config, release)
             else:
-                pass  # fail
+                logger.error('Cassandra cassandra=%s unrecognized' % (release,))
+                config.set_config("instance", "cass_release", "notrecognized")
             config.set_config("instance", "cassandra_configuration", "completed")
         else:
             logger.info('CassandraInstaller logged as completed, skipping.')
@@ -32,17 +33,17 @@ class CassandraInstaller:
         logger.exe('sudo apt-get install cassandra')
         config.set_config('instance', 'package', cass_release)
 
-    def install_cassandra_datastax(self, config, options):
-        if options.release and options.release.startswith('dsc1.0'):
-            cass_release = options.release
+    def install_cassandra_datastax(self, config, release):
+        if release.startswith('dsc1.0'):
+            cass_release = release
             if cass_release == '1.0.11-1':
                 cass_release = '1.0.11'
-            logger.info('Installing datastax cassandra cassandra=%s dsc=%s' % (cass_release, options.release))
-            logger.exe('sudo apt-get install -y python-cql cassandra={0} dsc={1}'.format(cass_release, options.release))
+            logger.info('Installing datastax cassandra cassandra=%s dsc=%s' % (cass_release, release))
+            logger.exe('sudo apt-get install -y python-cql cassandra={0} dsc={1}'.format(cass_release, release))
             config.set_config('instance', 'package', 'dsc')
             config.set_config('cassandra', 'partitioner', 'random_partitioner')
-        elif options.release and options.release.startswith('dsc1.1'):
-            dse_release = cass_release = options.release
+        elif release.startswith('dsc1.1'):
+            dse_release = cass_release = release
             if dse_release == '1.1.6':
                 dse_release = '1.1.6-1'
             if cass_release == "1.1":

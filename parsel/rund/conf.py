@@ -7,6 +7,7 @@ from  urllib2 import HTTPError
 from optparse import OptionParser
 import shlex
 from parsel import logger
+import traceback
 
 # Based on ComboAMI, see https://github.com/riptano/ComboAMI
 
@@ -69,20 +70,42 @@ class Config:
     def set_supplied_userdata(self, options):
         logger.info("set_supplied_userdata")
         self.set_config("instance", "java", "1.6")
-        self.set_config("cassandra", "distro", "apache")
         self.set_config("cassandra", "release", options.release)
+        self.set_config("instance", "cluster_name", options.cluster_name)
+        self.set_config("instance", "priam_agent_jar_url", options.priam_agent_jar_url)
+        self.set_config("instance", "priam_agent_jar_filename", options.priam_agent_jar_filename)
+        self.set_config("instance", "priam_war_url", options.priam_war_url)
+        self.set_config("instance", "priam_war_filename", options.priam_war_filename)
+        self.set_config("instance", "aws_region", options.aws_region)
 
     def parse_supplied_userdata(self, instance_data):
         parser = OptionParser()
-        parser.add_option("--release", action="store", type="string", dest="release", default="1.1",
+        parser.add_option("--release", action="store", type="string", dest="release", default="asf11x",
                           help="Option that allows for a release version of cassandra")
-        # noinspection PyBroadException
+        parser.add_option("--cluster_name", action="store", type="string", dest="cluster_name",
+                          help="Cluster_name")
+        parser.add_option("--puppet_master_addr", action="store", type="string", dest="puppet_master_addr",
+                          default="noop", help="Internal IP for Puppet Master")
+        parser.add_option("--aws_region", action="store", type="string", dest="aws_region", default="eu-west-1",
+                          help="AWS region")
+        parser.add_option("--graphite_addr", action="store", type="string", dest="graphite_addr", default="noop",
+                          help="Internal IP for Graphite")
+        parser.add_option("--priam_agent_jar_url", action="store", type="string", dest="priam_agent_jar_url",
+                          default="noop", help="Priam agent uri")
+        parser.add_option("--priam_agent_jar_filename", action="store", type="string", dest="priam_agent_jar_filename",
+                          default="noop", help="Priam agent filename")
+        parser.add_option("--priam_war_url", action="store", type="string", dest="priam_war_url",
+                          default="noop", help="Priam war uri")
+        parser.add_option("--priam_war_filename", action="store", type="string", dest="priam_war_filename",
+                          default="noop", help="Priam war filename")
+    # noinspection PyBroadException
         try:
             (options, args) = parser.parse_args(shlex.split(""))
             return options
         except:
+            traceback.print_exc()
             logger.exit_path(self, instance_data,
-                      "Options not set correctly, options follow: \n %s" % (str(instance_data['user-data']),))
+                             "Options not set correctly, options follow: \n %s" % (str(instance_data['user-data']),))
 
 
 if __name__ == "__main__":
