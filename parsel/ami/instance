@@ -78,7 +78,7 @@ def start(max_count,
         print "...Uploading parsel done."
 
         print "Uploading awscredential.properties file for Priam until we get IAM creds setup. Evil."
-        put(sftp, os.path.join(pem_dir, "awscredential.properties"), "awscredential.properties")
+        put(sftp, os.path.join(pem_dir, "awscredential.properties"), "/home/ubuntu/awscredential.properties")
         print "...Uploading creds done."
 
     ec2.create_tags(instance_ids, {"baker": "%s" % (baker, )})
