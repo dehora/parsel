@@ -43,6 +43,23 @@ def fixup_diamond():
     logger.exe("sudo /etc/init.d/diamond start")
 
 
+def reset_priam_and_cassandra(config):
+    if config.get_config("instance", "reset_priam_and_cassandra") != "completed":
+        logger.exe('sudo service cassandra stop')
+        logger.exe('sudo service tomcat7 stop')
+        time.sleep(10)
+        logger.exe('sudo rm -rf /var/lib/cassandra/data/system/*')
+        logger.exe('sudo rm -rf /var/lib/cassandra/commitlog/*')
+        logger.exe('sudo rm -rf /var/log/tomcat7/*')
+        logger.exe('sudo rm -rf /var/log/cassandra/*')
+        # priam will start cassandra for us
+        logger.exe('sudo service tomcat7 start')
+        logger.info('Cassandra/Priam was reset.')
+        config.set_config("instance", "reset_priam_and_cassandra", "completed")
+    else:
+        logger.info('Cassandra/Priam reset logged as completed, skipping.')
+
+
 def run():
     config = Config()
     if config.get_config("instance", "initial_configuration") != "completed":
@@ -121,8 +138,7 @@ def run():
             logger.info('Permissions configuration logged as completed, skipping.')
 
         restart_tasks(config)
-        # priam will start cassandra for us
-        logger.exe('sudo service tomcat7 start')
+        reset_priam_and_cassandra(config)
         logger.info("initd_configure.py completed!\n")
         config.set_config("instance", "initial_configuration", "completed")
     else:
