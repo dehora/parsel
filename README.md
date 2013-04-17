@@ -10,7 +10,7 @@ instance creation techniques from  [ComboAMI](https://github.com/riptano/ComboAM
  
 # License
 
-Copyright 2012 Bill de hÓra.
+Copyright 2012-2013 Bill de hÓra.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance 
 with the License. You may obtain a copy of the License at
