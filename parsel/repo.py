@@ -32,6 +32,8 @@ def install_apache_debian_repos(config, version="11x"):
         return
     exe('gpg --keyserver pgp.mit.edu --recv-keys 2B5C1B00')
     exe('gpg --export --armor 2B5C1B00 | sudo apt-key add -')
+    exe('gpg --keyserver pgp.mit.edu --recv-keys F758CE318D77295D')
+    exe('gpg --export --armor F758CE318D77295D | sudo apt-key add -')
     exe('sudo rm /etc/apt/sources.list.d/apache_cassandra.sources.list', log=False, expectError=True)
     pipe('echo "deb http://www.apache.org/dist/cassandra/debian %s main"' % version,
         'sudo tee -a /etc/apt/sources.list.d/apache_cassandra.sources.list')
