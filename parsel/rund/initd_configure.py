@@ -11,6 +11,32 @@ from parsel.rund.cassandra import CassandraInstaller
 from parsel.rund.priam import PriamInstaller
 
 
+def configure_puppet_host(config, options):
+    if config.get_config("instance", "puppet_host") != "completed":
+        if options.puppet_master_addr != "noop":
+            logger.pipe('sudo echo "%s    puppet.server.pri"' % (options.puppet_master_addr,), 'sudo tee -a /etc/hosts')
+            logger.pipe('sudo echo "%s    puppet"' % (options.puppet_master_addr,), 'sudo tee -a /etc/hosts')
+            logger.info('Puppet /etc/hosts using [%s puppet]' % (options.puppet_master_addr,))
+        else:
+            logger.info('Puppet /etc/hosts configuration is a noop, skipping.')
+        config.set_config("instance", "puppet_host", "completed")
+    else:
+        logger.info('Puppet /etc/hosts configuration logged as completed, skipping.')
+
+
+def configure_graphite_host(config, options):
+    if config.get_config("instance", "graphite_host") != "completed":
+        if options.graphite_addr != "noop":
+            logger.pipe('sudo echo "%s    graphite.server.pri"' % (options.graphite_addr,), 'sudo tee -a /etc/hosts')
+            logger.pipe('sudo echo "%s    graphite"' % (options.graphite_addr,), 'sudo tee -a /etc/hosts')
+            logger.info('Graphite /etc/hosts using [%s graphite.server.pri and graphite]' % (options.graphite_addr,))
+        else:
+            logger.info('Graphite /etc/hosts configuration is a noop, skipping.')
+        config.set_config("instance", "graphite_host", "completed")
+    else:
+        logger.info('Graphite /etc/hosts configuration logged as completed, skipping.')
+
+
 def restart_tasks(config):
     logger.exe('sudo mount -a')
     logger.exe('sudo swapoff --all')
@@ -139,6 +165,8 @@ def run():
 
         restart_tasks(config)
         reset_priam_and_cassandra(config)
+        configure_graphite_host(config, options)
+        configure_puppet_host(config, options)
         logger.info("initd_configure.py completed!\n")
         config.set_config("instance", "initial_configuration", "completed")
     else:
