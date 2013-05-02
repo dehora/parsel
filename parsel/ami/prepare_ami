@@ -81,6 +81,12 @@ def install_packages():
         if result.failed and not confirm("apt-get %s failed. Continue anyway?" % package):
             abort("Failing on %s" % package)
 
+    for package in ["superlance"]:
+        with settings(warn_only=True):
+            result = local("sudo pip install %s" % package)
+        if result.failed and not confirm("sudo pip install %s failed. Continue anyway?" % package):
+            abort("Failing on %s" % package)
+
 
 def install_java6(java6_uri, java_bin, java_version):
     java_home = "%s/%s" % (JAVA_BASE, java_version)
@@ -96,39 +102,6 @@ def install_java6(java6_uri, java_bin, java_version):
     local('sudo update-alternatives --set java %s/bin/java' % (java_home,))
     os.chdir(home_path)
     return java_home
-
-
-def setup_profiles():
-    profile = '/home/ubuntu/.profile'
-    local('sudo chmod 777 ' + profile)
-    with open(profile, 'a') as f:
-        f.write("""
-
-python parsel/parsel/rund/motd.py
-export JAVA_HOME=/opt/java/64/jdk1.6.0_38
-export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
-""")
-    local('sudo chmod 644 ' + profile)
-
-    bashrc = '/home/ubuntu/.bashrc'
-    local('sudo chmod 777 ' + bashrc)
-    with open(bashrc, 'a') as f:
-        f.write("""
-
-export JAVA_HOME=/opt/java/64/jdk1.6.0_38
-export PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel
-""")
-    local('sudo chmod 644 ' + bashrc)
-    local('sudo chmod 777 /root/.profile')
-    local('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.profile')
-    local('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.profile')
-    local('sudo chmod 644 /root/.profile')
-    local('sudo chmod 777 /root/.bashrc')
-    local('sudo echo "JAVA_HOME=/opt/java/64/jdk1.6.0_38" >> /root/.bashrc')
-    local('sudo echo "PYTHONPATH=${PYTHONPATH}:/home/ubuntu/parsel" >> /root/.bashrc')
-    local('sudo chmod 644 /root/.bashrc')
-
-    os.chdir('/home/ubuntu')
 
 
 def install_initd(java_home):
