@@ -24,9 +24,9 @@ quotes = ["How's that for a slice of fried gold?",
           "Read 1 MB sequentially from memory: 250,000ns (0.25ms)",
           "Round trip within same datacenter: 500,000 ns (0.5ms)",
           "Disk seek: 10,000,000ns (10ms)",
-          "Read 1 MB sequentially from network: 10ms",
-          "Read 1 MB sequentially from disk: 30ms",
-          "Send packet CA->Netherlands->CA: 150ms",
+          "Read 1 MB sequentially from network: 10,000,000ns (10ms)",
+          "Read 1 MB sequentially from disk: 30,000,000ns (30ms)",
+          "Send packet CA->Netherlands->CA: 150,000,000ns (150ms)",
           "Rotational random seek delay at 10K RPM: 3ms"]
 
 
