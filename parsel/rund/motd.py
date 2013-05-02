@@ -13,7 +13,21 @@ quotes = ["How's that for a slice of fried gold?",
           "Player 2 has entered the game.",
           "The zed-word. Don't say it!",
           "Cornetto.",
-          "That is really going to exacerbate things for all of us."]
+          "That is really going to exacerbate things for all of us.",
+          "L1 cache reference: 0.5ns"
+          "Branch mispredict: 5ns",
+          "L2 cache reference: 7ns",
+          "Mutex lock/unlock: 100ns",
+          "Main memory reference: 100ns",
+          "Compress 1K bytes with Zippy: 10,000ns",
+          "Send 2K bytes over 1 Gbps network: 20,000ns",
+          "Read 1 MB sequentially from memory: 250,000ns (0.25ms)",
+          "Round trip within same datacenter: 500,000 ns (0.5ms)",
+          "Disk seek: 10,000,000ns (10ms)",
+          "Read 1 MB sequentially from network: 10ms",
+          "Read 1 MB sequentially from disk: 30ms",
+          "Send packet CA->Netherlands->CA: 150ms",
+          "Rotational random seek delay at 10K RPM: 3ms"]
 
 
 def nodetool_ring():
@@ -44,7 +58,7 @@ def node_type():
 | |__| (_| \__ \__ \ (_| | | | | (_| | | | (_| |
  \____\__,_|___/___/\__,_|_| |_|\__,_|_|  \__,_|
 
-    "%s"
+   "%s"
 
 Logs:
    tail -f /var/log/tomcat7/priam.log
