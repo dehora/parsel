@@ -13,35 +13,35 @@ from optparse import OptionParser, OptionGroup
 ami_dict = [
     {
         'region': 'us-east-1',
-        'ami': 'ami-f2191786'
+        'name': 'stage-useast1'
     },
     {
         'region': 'us-west-1',
-        'ami': 'ami-f2191786'
+        'name': 'stage-uswest1'
     },
     {
         'region': 'us-west-2',
-        'ami': 'ami-f2191786'
+        'name': 'stage-uswest2'
     },
     {
         'region': 'eu-west-1',
-        'ami': 'ami-f2191786'
+        'name': 'stage-euwest1'
     },
     {
         'region': 'ap-southeast-1',
-        'ami': 'ami-f2191786'
+        'name': 'stage-apsoutheast1'
     },
     {
         'region': 'ap-southeast-2',
-        'ami': 'ami-f2191786'
+        'name': 'stage-apsoutheast2'
     },
     {
         'region': 'ap-northeast-1',
-        'ami': 'ami-f2191786'
+        'name': 'stage-apnortheast1'
     },
     {
         'region': 'sa-east-1',
-        'ami': 'ami-f2191786'
+        'name': 'stage-saeast1'
     }
 ]
 
@@ -59,15 +59,15 @@ def create_key_pairs(keypath, keypair, secretkey):
         # noinspection PyBroadException
         try:
             print 'Creating key pair: %s' % (ami, )
-            key = conn.create_key_pair(ami['region'])
+            key = conn.create_key_pair(ami['name'])
             # noinspection PyBroadException
             try:
-                print 'Saving keypair: %s' % (os.path.join(pem_home, ami['region']), )
+                print 'Saving keypair: %s' % (os.path.join(pem_home, ami['name']), )
                 key.save(pem_home)
             except Exception:
                 print 'Could not save locally, deleting key pair in AWS: %s' % (ami, )
                 traceback.print_exc()
-                conn.delete_key_pair(ami['region'])
+                conn.delete_key_pair(ami['name'])
                 sys.exit(1)
         except Exception:
             print "Couldn't create key pair, error follows:"
@@ -115,7 +115,7 @@ Commands:
     elif command == "env_create":
         aws_access_key_id = os.getenv('AWS_ACCESS_KEY', 'aws_access_key_id')
         aws_secret_access_key = os.getenv('AWS_SECRET_KEY', 'aws_secret_access_key')
-        pem_home = os.getenv('AWS_PEM_HOME', 'aws_pem_home')
+        pem_home = os.getenv('AWS_PEM_HOME', '~/.ec2')
         create_key_pairs(pem_home, aws_access_key_id, aws_secret_access_key)
     else:
         parser.error('Command not recognized.')
