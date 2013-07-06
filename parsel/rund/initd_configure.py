@@ -69,21 +69,25 @@ def fixup_diamond():
     logger.exe("sudo /etc/init.d/diamond start")
 
 
-def reset_priam_and_cassandra(config):
-    if config.get_config("instance", "reset_priam_and_cassandra") != "completed":
+def reset_cassandra(config):
+    if config.get_config("instance", "reset_cassandra") != "completed":
         logger.exe('sudo service cassandra stop')
-        logger.exe('sudo service tomcat7 stop')
-        time.sleep(10)
         logger.exe('sudo rm -rf /var/lib/cassandra/data/system/*')
         logger.exe('sudo rm -rf /var/lib/cassandra/commitlog/*')
-        logger.exe('sudo rm -rf /var/log/tomcat7/*')
         logger.exe('sudo rm -rf /var/log/cassandra/*')
-        # priam will start cassandra for us
-        logger.exe('sudo service tomcat7 start')
-        logger.info('Cassandra/Priam was reset.')
-        config.set_config("instance", "reset_priam_and_cassandra", "completed")
+        logger.info('Cassandra was reset.')
+        config.set_config("instance", "reset_cassandra", "completed")
     else:
-        logger.info('Cassandra/Priam reset logged as completed, skipping.')
+        logger.info('Cassandra reset logged as completed, skipping.')
+
+
+def reset_priam(config):
+    if config.get_config("instance", "reset_priam") != "completed":
+        logger.exe('sudo service tomcat7 start')
+        logger.info('Priam was reset.')
+        config.set_config("instance", "reset_priam", "completed")
+    else:
+        logger.info('Priam reset logged as completed, skipping.')
 
 
 def run():
@@ -94,6 +98,10 @@ def run():
         config.set_supplied_userdata(options)
         RaidInstaller().install(config)
         CassandraInstaller().install(config, options.release)
+        reset_cassandra(config)
+        logger.exe('sudo service tomcat7 stop')
+        time.sleep(10)
+        logger.exe('sudo rm -rf /var/log/tomcat7/*')
         PriamInstaller().install(
             config,
             options.priam_agent_jar_url,
@@ -164,7 +172,7 @@ def run():
             logger.info('Permissions configuration logged as completed, skipping.')
 
         restart_tasks(config)
-        reset_priam_and_cassandra(config)
+        reset_priam(config)
         configure_graphite_host(config, options)
         configure_puppet_host(config, options)
         logger.info("initd_configure.py completed!\n")
