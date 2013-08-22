@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-echo "Packer ENV"
+echo && echo "Packer ENV"
 echo "---------------------------------------------------------------"
 echo "CASSANDRA_DEB_VERSION $CASSANDRA_DEB_VERSION"
 echo "JMXTRANS_URL $JMXTRANS_URL"
@@ -63,13 +63,13 @@ sudo apt-get -y install tomcat7
 sudo apt-get -y --no-install-recommends install mdadm
 
 
-echo "Stopping Tomcat, using Java7 "
+echo && echo "Stopping Tomcat, using Java7 "
 echo "---------------------------------------------------------------"
 sudo service tomcat7 stop
 echo "JAVA_HOME=\"/usr/local/java/jdk1.7.0_07\"" | sudo tee -a /etc/default/tomcat7
 
 
-echo "Using European TZ servers"
+echo && echo "Using European TZ servers"
 echo "---------------------------------------------------------------"
 echo "server 0.ie.pool.ntp.org" | sudo tee -a /etc/ntp.conf
 echo "server 1.ie.pool.ntp.org" | sudo tee -a /etc/ntp.conf
@@ -79,20 +79,20 @@ echo "server 3.ie.pool.ntp.org" | sudo tee -a /etc/ntp.conf
 sudo service ntp restart
 
 
-echo "Installing pip modules"
+echo && echo "Installing pip modules"
 echo "---------------------------------------------------------------"
 sudo pip install superlance
 sudo pip install fabric
 
 
-echo "Installing JMXTrans"
+echo && echo "Installing JMXTrans"
 echo "---------------------------------------------------------------"
 sudo wget  --no-check-certificate --output-document $JMXTRANS_FILE $JMXTRANS_URL
 export DEBIAN_FRONTEND=noninteractive
 sudo -E dpkg -i $JMXTRANS_FILE
 
 
-echo "Installing Cassandra"
+echo && echo "Installing Cassandra"
 echo "---------------------------------------------------------------"
 sudo gpg --keyserver pgp.mit.edu --recv-keys 2B5C1B00
 sudo gpg --export --armor 2B5C1B00 | sudo apt-key add -
@@ -106,19 +106,19 @@ sudo apt-get -y --force-yes install cassandra
 
 
 # the deb starts c* which assigns itself a random token, disable/clean
-echo "Stopping Cassandra, to let Priam manage tokens"
+echo && echo "Stopping Cassandra, to let Priam manage tokens"
 echo "---------------------------------------------------------------"
 sudo service cassandra stop
 
 
-echo "Removing Cassandra data"
+echo && echo "Removing Cassandra data"
 echo "---------------------------------------------------------------"
 sudo rm -rf /var/lib/cassandra/data/system/*
 sudo rm -rf /var/lib/cassandra/commitlog/*
 sudo rm -rf /var/log/cassandra/*
 
 
-echo "Installing Priam"
+echo && echo "Installing Priam"
 echo "---------------------------------------------------------------"
 sudo wget --no-check-certificate --output-document $PRIAM_JAR_FILE $PRIAM_JAR_URL
 sudo mv $PRIAM_JAR_FILE/usr/share/cassandra/lib/$PRIAM_JAR_FILE
@@ -128,7 +128,7 @@ sudo wget --no-check-certificate --output-document $PRIAM_WAR_FILE $PRIAM_WAR_UR
 sudo mv $PRIAM_WAR_FILE /var/lib/tomcat7/webapps/Priam.war
 sudo mv /tmp/awscredential.properties /etc/
 
-echo "Installing Parsel"
+echo && echo "Installing Parsel"
 echo "---------------------------------------------------------------"
 mv /tmp/parsel.tar.gz /home/ubuntu
 cd /home/ubuntu
@@ -137,7 +137,7 @@ sudo chown -R ubuntu:ubuntu /home/ubuntu/parsel
 tree /home/ubuntu/parsel
 
 
-echo "Configuring Limits"
+echo && echo "Configuring Limits"
 echo "---------------------------------------------------------------"
 echo "* soft nofile 32768" | sudo tee -a /etc/security/limits.conf
 echo "* hard nofile 32768" | sudo tee -a /etc/security/limits.conf
@@ -145,19 +145,19 @@ echo "root soft nofile 32768" | sudo tee -a /etc/security/limits.conf
 echo "root hard nofile 32768" | sudo tee -a /etc/security/limits.conf
 
 
-echo "Configuring Graphite Host"
+echo && echo "Configuring Graphite Host"
 echo "---------------------------------------------------------------"
 sudo echo "$GRAPHITE_HOST    graphite.server.pri" | sudo tee -a /etc/hosts
 sudo echo "$GRAPHITE_HOST    graphite" | sudo tee -a /etc/hosts
 
 
-echo "Configuring Puppet Host"
+echo && echo "Configuring Puppet Host"
 echo "---------------------------------------------------------------"
 sudo echo "$PUPPET_HOST    puppet.server.pri" | sudo tee -a /etc/hosts
 sudo echo "$PUPPET_HOST    puppet" | sudo tee -a /etc/hosts
 
 
-echo "Configuring .profile"
+echo && echo "Configuring .profile"
 echo "---------------------------------------------------------------"
 sudo chmod 777 /home/ubuntu/.profile
 sudo echo "python parsel/parsel/rund/motd.py" | sudo tee -a  /home/ubuntu/.profile
@@ -165,20 +165,20 @@ sudo echo "export PYTHONPATH=\${PYTHONPATH}:/home/ubuntu/parsel" | sudo tee -a  
 sudo chmod 644 /home/ubuntu/.profile
 
 
-echo "Configuring .bashrc"
+echo && echo "Configuring .bashrc"
 echo "---------------------------------------------------------------"
 sudo chmod 777 /home/ubuntu/.bashrc
 sudo echo "export PYTHONPATH=\${PYTHONPATH}:/home/ubuntu/parsel" | sudo tee -a  /home/ubuntu/.bashrc
 sudo chmod 644 /home/ubuntu/.bashrc
 
 
-echo "Configuring parsel log dir"
+echo && echo "Configuring parsel log dir"
 echo "---------------------------------------------------------------"
 sudo mkdir -p /var/log/parsel
 sudo chown -hR ubuntu:ubuntu /var/log/parsel
 
 
-echo "Configuring /etc/init.d/init-parsel.sh"
+echo && echo "Configuring /etc/init.d/init-parsel.sh"
 echo "---------------------------------------------------------------"
 sudo mv /tmp/init-parsel.sh /etc/init.d/
 sudo chmod 777 /etc/init.d/init-parsel.sh
