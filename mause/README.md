@@ -1,4 +1,4 @@
 mause
 =====
 
-Scripts for creating Kafka clusters in AWS
+Scripts for initializing a Kafka broker in AWS
