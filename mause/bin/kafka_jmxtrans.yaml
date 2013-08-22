@@ -1,0 +1,94 @@
+graphite_host: "graphite.server.pri"
+graphite_port: 2003
+query_port: 9011
+
+queries:
+
+    - name: mempool
+      obj: "java.lang:type=MemoryPool,name=*"
+      resultAlias: "memorypool"
+      attr:
+        - "Usage"
+
+    - name: jvm_mem
+      obj: "java.lang:type=Memory"
+      resultAlias: "jvm_mem"
+      attr:
+        - "HeapMemoryUsage"
+        - "NonHeapMemoryUsage"
+
+    - name: gc
+      obj: "java.lang:type=GarbageCollector,name=*"
+      resultAlias: "gc"
+      attr:
+        - "CollectionCount"
+        - "CollectionTime"
+
+    - name: sys
+      obj: "java.lang:type=OperatingSystem"
+      resultAlias: "sys"
+      attr:
+        - "SystemLoadAverage"
+        - "AvailableProcessors"
+        - "TotalPhysicalMemorySize"
+        - "FreePhysicalMemorySize"
+        - "TotalSwapSpaceSize"
+        - "FreeSwapSpaceSize"
+        - "OpenFileDescriptorCount"
+        - "MaxFileDescriptorCount"
+
+    - name: threads
+      obj : "java.lang:type=Threading"
+      resultAlias: "threads"
+      attr:
+        - "DaemonThreadCount"
+        - "PeakThreadCount"
+        - "ThreadCount"
+        - "TotalStartedThreadCount"
+    #
+    # Kafka Metrics
+    #
+    - name: SocketServerStats
+      obj : "kafka:type=kafka.SocketServerStats"
+      resultAlias : "SocketServerStats"
+      attr:
+        - "ProduceRequestsPerSecond"
+        - "FetchRequestsPerSecond"
+        - "AvgProduceRequestMs"
+        - "MaxProduceRequestMs"
+        - "AvgFetchRequestMs"
+        - "MaxFetchRequestMs"
+        - "BytesReadPerSecond"
+        - "BytesWrittenPerSecond"
+        - "NumProduceRequests"
+        - "TotalBytesRead"
+        - "TotalBytesWritten"
+        - "TotalFetchRequestMs"
+        - "TotalProduceRequestMs"
+
+    - name: LogFlushStats
+      obj : "kafka:type=kafka.LogFlushStats"
+      resultAlias : "LogFlushStats"
+      attr:
+        - "FlushesPerSecond"
+        - "AvgFlushMs"
+        - "TotalFlushMs"
+        - "MaxProduceRequestMs"
+        - "MaxFlushMs"
+        - "NumFlushes"
+
+
+
+sets:
+  - setname: kafka_jmxtrans
+    query_names:
+            - mempool
+            - jvm_mem
+            - gc
+            - sys
+            - threads
+            - SocketServerStats
+            - LogFlushStats
+
+    hosts:
+            - 127.0.0.1

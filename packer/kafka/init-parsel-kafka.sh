@@ -17,7 +17,20 @@ sudo mkdir -p /var/log/parsel
 sudo touch /etc/parsel/parsel.conf
 sudo chown -R ubuntu:ubuntu /etc/parsel
 sudo chown -R ubuntu:ubuntu /var/log/parsel
+
 echo 1 | sudo tee /proc/sys/vm/overcommit_memory
+
+if [ -d "/data" ]; then
+    sudo blockdev --setra 512 /dev/md0
+    sudo blockdev --setra 512 /dev/xvdh1
+    sudo blockdev --setra 512 /dev/xvdh2
+    sudo blockdev --setra 512 /dev/xvdh3
+    sudo blockdev --setra 512 /dev/xvdh4
+fi
+
+sudo mount -a
+sudo swapoff --all
+
 echo "\n -------------------------------------\n" >> /var/log/parsel/parsel.log
-cd /home/ubuntu/parsel/parsel/rund
+cd /home/ubuntu/parsel/mause/rund
 python initd_configure.py

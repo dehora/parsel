@@ -13,13 +13,12 @@
         "parsel_tar_target": "",
         "init_parsel_src": "",
         "init_parsel_target": "",
-        "cassandra_version": ""
+        "init_parsel_name": "",
+        "kafka_version": ""
         ,"jmxtrans_url": ""
         ,"jmxtrans_file": ""
-        ,"priam_war_url": ""
-        ,"priam_war_file": ""
-        ,"priam_jar_url": ""
-        ,"priam_jar_file": ""
+        ,"kafka_url": ""
+        ,"kafka_file": ""
         ,"graphite_host": ""
         ,"puppet_host": ""
         ,"parsel_version": ""
@@ -32,20 +31,14 @@
         "source_ami": "{{user `source_ami`}}",
         "instance_type": "{{user `instance_type`}}",
         "ssh_username": "{{user `user_account`}}",
-        "ami_name": "packer-cassandra-{{user `cassandra_version`}}-{{timestamp}}",
-        "ami_description": "Cassandra AMI {{user `cassandra_version`}} {{timestamp}}",
+        "ami_name": "packer-kafka-{{user `kafka_version`}}-{{timestamp}}",
+        "ami_description": "Kafka AMI {{user `kafka_version`}} {{timestamp}}",
         "security_group_id": "{{user `security_group_id`}}",
         "tags": {
-            "cassandra_version": "{{user `cassandra_version`}}"
+            "kafka_version": "{{user `kafka_version`}}"
         }
     }
 ], "provisioners": [
-    {
-        "type": "file",
-        "source": "{{user `awscredential_properties_src`}}",
-        "destination": "{{user `awscredential_properties_target`}}"
-    }
-    ,
     {
         "type": "file",
         "source": "{{user `parsel_tar_src`}}",
@@ -61,15 +54,13 @@
     {
         "type": "shell",
         "environment_vars":[
-            "CASSANDRA_DEB_VERSION={{user `cassandra_version`}}"
-            ,"JMXTRANS_URL={{user `jmxtrans_url`}}"
+            "JMXTRANS_URL={{user `jmxtrans_url`}}"
             ,"JMXTRANS_FILE={{user `jmxtrans_file`}}"
             ,"GRAPHITE_HOST={{user `graphite_host`}}"
             ,"PUPPET_HOST={{user `puppet_host`}}"
-            ,"PRIAM_WAR_URL={{user `priam_war_url`}}"
-            ,"PRIAM_WAR_FILE={{user `priam_war_file`}}"
-            ,"PRIAM_JAR_URL={{user `priam_jar_url`}}"
-            ,"PRIAM_JAR_FILE={{user `priam_jar_file`}}"
+            ,"KAFKA_VERSION={{user `kafka_version`}}"
+            ,"KAFKA_URL={{user `kafka_url`}}"
+            ,"KAFKA_FILE={{user `kafka_file`}}"
         ],
         "scripts": [
             "setup.sh"

@@ -1,0 +1,173 @@
+{
+ "servers": [
+  {
+   "numQueryThreads": 7, 
+   "host": "127.0.0.1", 
+   "port": 9011, 
+   "queries": [
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "memorypool", 
+     "obj": "java.lang:type=MemoryPool,name=*", 
+     "attr": [
+      "Usage"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "jvm_mem", 
+     "obj": "java.lang:type=Memory", 
+     "attr": [
+      "HeapMemoryUsage", 
+      "NonHeapMemoryUsage"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "gc", 
+     "obj": "java.lang:type=GarbageCollector,name=*", 
+     "attr": [
+      "CollectionCount", 
+      "CollectionTime"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "sys", 
+     "obj": "java.lang:type=OperatingSystem", 
+     "attr": [
+      "SystemLoadAverage", 
+      "AvailableProcessors", 
+      "TotalPhysicalMemorySize", 
+      "FreePhysicalMemorySize", 
+      "TotalSwapSpaceSize", 
+      "FreeSwapSpaceSize", 
+      "OpenFileDescriptorCount", 
+      "MaxFileDescriptorCount"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "threads", 
+     "obj": "java.lang:type=Threading", 
+     "attr": [
+      "DaemonThreadCount", 
+      "PeakThreadCount", 
+      "ThreadCount", 
+      "TotalStartedThreadCount"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "SocketServerStats", 
+     "obj": "kafka:type=kafka.SocketServerStats", 
+     "attr": [
+      "ProduceRequestsPerSecond", 
+      "FetchRequestsPerSecond", 
+      "AvgProduceRequestMs", 
+      "MaxProduceRequestMs", 
+      "AvgFetchRequestMs", 
+      "MaxFetchRequestMs", 
+      "BytesReadPerSecond", 
+      "BytesWrittenPerSecond", 
+      "NumProduceRequests", 
+      "TotalBytesRead", 
+      "TotalBytesWritten", 
+      "TotalFetchRequestMs", 
+      "TotalProduceRequestMs"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "LogFlushStats", 
+     "obj": "kafka:type=kafka.LogFlushStats", 
+     "attr": [
+      "FlushesPerSecond", 
+      "AvgFlushMs", 
+      "TotalFlushMs", 
+      "MaxProduceRequestMs", 
+      "MaxFlushMs", 
+      "NumFlushes"
+     ]
+    }
+   ]
+  }
+ ]
+}
