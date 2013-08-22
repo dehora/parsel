@@ -1,6 +1,0 @@
-master
-
-The first line above tells the prepare_ami.sh script the branch target ,
-which is used to checkout a branch when preparing the AMI from the baking instance.
-
-The published version is kept in the parsel/version file

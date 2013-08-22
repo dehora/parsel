@@ -3,13 +3,13 @@
 import ConfigParser
 import os
 import urllib2
-from  urllib2 import HTTPError
+from urllib2 import HTTPError
 from optparse import OptionParser
 import shlex
-from parsel import logger
 import traceback
 
 # Based on ComboAMI, see https://github.com/riptano/ComboAMI
+from parsel.rund import logger
 
 configfile = '/etc/parsel/parsel.conf'
 
@@ -31,7 +31,6 @@ class Config:
         try:
             self.config_parser.add_section('instance')
             self.config_parser.add_section('cassandra')
-            self.config_parser.add_section('priam')
         except:
             pass
 
@@ -64,43 +63,24 @@ class Config:
             instance_data['user-data'] = ''
         instancetype = http_get('http://instance-data/latest/meta-data/instance-type')
         logger.info("instance-type: %s" % instancetype)
-        if instancetype == 'm1.small' or instancetype == 'm1.medium':
-            logger.exit_path(self, "m1.small and m1.medium instances too small, must be at least m1.large.", instance_data)
+        if instancetype == 'm1.small' or instancetype == 'm1.micro':
+            logger.exit_path(self, "instance too small, must be at least m1.medium.", instance_data)
 
         instance_data['local-ipv4'] = http_get('http://instance-data/latest/meta-data/local-ipv4')
         return instance_data
 
     def set_supplied_userdata(self, options):
         logger.info("set_supplied_userdata")
-        self.set_config("instance", "java", "1.6")
-        self.set_config("cassandra", "release", options.release)
         self.set_config("instance", "cluster_name", options.cluster_name)
-        self.set_config("instance", "priam_agent_jar_url", options.priam_agent_jar_url)
-        self.set_config("instance", "priam_agent_jar_filename", options.priam_agent_jar_filename)
-        self.set_config("instance", "priam_war_url", options.priam_war_url)
-        self.set_config("instance", "priam_war_filename", options.priam_war_filename)
         self.set_config("instance", "aws_region", options.aws_region)
 
     def parse_supplied_userdata(self, instance_data):
         parser = OptionParser()
-        parser.add_option("--release", action="store", type="string", dest="release", default="asf11x",
-                          help="Option that allows for a release version of cassandra")
         parser.add_option("--cluster_name", action="store", type="string", dest="cluster_name",
                           help="Cluster_name")
-        parser.add_option("--puppet_master_addr", action="store", type="string", dest="puppet_master_addr",
-                          default="noop", help="Internal IP for Puppet Master")
         parser.add_option("--aws_region", action="store", type="string", dest="aws_region", default="eu-west-1",
                           help="AWS region")
-        parser.add_option("--graphite_addr", action="store", type="string", dest="graphite_addr", default="noop",
-                          help="Internal IP for Graphite")
-        parser.add_option("--priam_agent_jar_url", action="store", type="string", dest="priam_agent_jar_url",
-                          default="noop", help="Priam agent uri")
-        parser.add_option("--priam_agent_jar_filename", action="store", type="string", dest="priam_agent_jar_filename",
-                          default="noop", help="Priam agent filename")
-        parser.add_option("--priam_war_url", action="store", type="string", dest="priam_war_url",
-                          default="noop", help="Priam war uri")
-        parser.add_option("--priam_war_filename", action="store", type="string", dest="priam_war_filename",
-                          default="noop", help="Priam war filename")
+
     # noinspection PyBroadException
         try:
             (options, args) = parser.parse_args(shlex.split(instance_data['user-data']))

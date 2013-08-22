@@ -66,12 +66,13 @@ Logs:
 
 C* Commands:
   cassandra-cli
+  cqlsh
   nodetool info|tpstats|cfstats|compactionstats|netstats
   More: nodetool --help
 
 Priam Commands:
-  curl http://127.0.0.1:8080/Priam/REST/v1/cassadmin/start
-  curl http://127.0.0.1:8080/Priam/REST/v1/cassadmin/stop
+  curl -v http://127.0.0.1:8080/Priam/REST/v1/cassadmin/start
+  curl -v http://127.0.0.1:8080/Priam/REST/v1/cassadmin/stop
   More: https://github.com/dehora/Priam/wiki/REST-API
 """ % (choice(quotes))
 

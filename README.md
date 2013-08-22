@@ -7,7 +7,7 @@ instance creation techniques from  [ComboAMI](https://github.com/riptano/ComboAM
 # Documentation
 
  - See [the wiki](https://github.com/dehora/parsel/wiki).
- 
+
 # License
 
 Copyright 2012-2013 Bill de hÓra.

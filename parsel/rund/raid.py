@@ -1,9 +1,9 @@
 import glob
 import time
 import os
-from parsel import logger
 
 # Based on ComboAMI, see https://github.com/riptano/ComboAMI
+from parsel.rund import logger
 
 
 class RaidInstaller:
