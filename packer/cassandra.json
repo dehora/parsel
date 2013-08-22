@@ -9,7 +9,6 @@
         "awscredential_properties_target": "",
         "user_account": "",
         "instance_type": "",
-        "builder_type": "",
         "parsel_tar_src": "",
         "parsel_tar_target": "",
         "init_parsel_src": "",
@@ -23,6 +22,7 @@
         ,"priam_jar_file": ""
         ,"graphite_host": ""
         ,"puppet_host": ""
+        ,"parsel_version": ""
     }, "builders": [
     {
         "type": "amazon-ebs",

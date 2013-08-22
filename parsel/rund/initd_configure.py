@@ -1,10 +1,27 @@
 #!/usr/bin/env python
 
 import time
+import re
+import os
 from parsel.rund import logger
 
 from parsel.rund.conf import Config
 from parsel.rund.raid import RaidInstaller
+
+
+def configure_jmxtrans(config, ipaddr):
+    if config.get_config("instance", "jmxtrans") != "completed":
+        with open('/home/ubuntu/parsel/parsel/bin/cassandra_jmxtrans.json', 'r') as f:
+            json = f.read()
+        p = re.compile('"127.0.0.1"')
+        json = p.sub('"{0}"'.format(ipaddr), json)
+        logger.exe("sudo mkdir -p /var/lib/jmxtrans")
+        with open(os.path.join('/var/lib/jmxtrans/', 'cassandra_jmxtrans.json'), 'w') as f:
+            f.write(json)
+        logger.info('cassandra_jmxtrans.json configured with %s as source host.' % (ipaddr,))
+        config.set_config("instance", "jmxtrans", "completed")
+    else:
+        logger.info('jmxtrans configuration logged as completed, skipping.')
 
 
 def disk_tasks(config):
@@ -35,8 +52,11 @@ def run():
         config.set_supplied_userdata(options)
         logger.exe('sudo service cassandra stop')
         logger.exe('sudo service tomcat7 stop')
+        logger.exe('sudo service jmxtrans stop')
         RaidInstaller().install(config)
         reset_cassandra(config)
+        configure_jmxtrans(config, instance_data['local-ipv4'])
+        logger.exe('sudo service jmxtrans start ')
         time.sleep(10)
         logger.exe('sudo rm -rf /var/log/tomcat7/*')
 

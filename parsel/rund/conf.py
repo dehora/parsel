@@ -15,10 +15,10 @@ configfile = '/etc/parsel/parsel.conf'
 
 
 def http_get(url):
-        try:
-            return urllib2.urlopen(urllib2.Request(url)).read()
-        except HTTPError:
-            logger.info("Failed to fetch %s, retrying..." % url)
+    try:
+        return urllib2.urlopen(urllib2.Request(url)).read()
+    except HTTPError:
+        logger.info("Failed to fetch %s, retrying..." % url)
 
 
 class Config:
@@ -81,7 +81,7 @@ class Config:
         parser.add_option("--aws_region", action="store", type="string", dest="aws_region", default="eu-west-1",
                           help="AWS region")
 
-    # noinspection PyBroadException
+        # noinspection PyBroadException
         try:
             (options, args) = parser.parse_args(shlex.split(instance_data['user-data']))
             return options
