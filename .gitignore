@@ -3,6 +3,10 @@ packer/packer_cache
 packer/crash.log
 packer/variables.json
 
+variables.json
+crash.log
+packer_cache
+
 awscredential.properties
 .DS_Store
 .idea/
