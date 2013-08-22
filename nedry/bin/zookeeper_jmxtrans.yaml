@@ -1,0 +1,99 @@
+graphite_host: "graphite.server.pri"
+graphite_port: 2003
+query_port: 9011
+
+queries:
+
+    - name: mempool
+      obj: "java.lang:type=MemoryPool,name=*"
+      resultAlias: "memorypool"
+      attr:
+        - "Usage"
+
+    - name: jvm_mem
+      obj: "java.lang:type=Memory"
+      resultAlias: "jvm_mem"
+      attr:
+        - "HeapMemoryUsage"
+        - "NonHeapMemoryUsage"
+
+    - name: gc
+      obj: "java.lang:type=GarbageCollector,name=*"
+      resultAlias: "gc"
+      attr:
+        - "CollectionCount"
+        - "CollectionTime"
+
+    - name: sys
+      obj: "java.lang:type=OperatingSystem"
+      resultAlias: "sys"
+      attr:
+        - "SystemLoadAverage"
+        - "AvailableProcessors"
+        - "TotalPhysicalMemorySize"
+        - "FreePhysicalMemorySize"
+        - "TotalSwapSpaceSize"
+        - "FreeSwapSpaceSize"
+        - "OpenFileDescriptorCount"
+        - "MaxFileDescriptorCount"
+
+    - name: threads
+      obj : "java.lang:type=Threading"
+      resultAlias: "threads"
+      attr:
+        - "DaemonThreadCount"
+        - "PeakThreadCount"
+        - "ThreadCount"
+        - "TotalStartedThreadCount"
+    #
+    # ZooKeeperService Metrics
+    #
+    - name: quorumsize
+      obj : "org.apache.ZooKeeperService:name0=ReplicatedServer_id*"
+      resultAlias : "quorumsize"
+      attr:
+        - "QuorumSize"
+
+    - name: replicatedserver
+      obj : "org.apache.ZooKeeperService:name0=ReplicatedServer_id*,name1=replica*,name2=*"
+      resultAlias : "replicatedserver"
+      attr:
+        - "MaxClientCnxnsPerHost"
+        - "MaxRequestLatency"
+        - "AvgRequestLatency"
+        - "MinRequestLatency"
+        - "MaxSessionTimeout"
+        - "MinSessionTimeout"
+        - "OutstandingRequests"
+        - "PacketsReceived"
+        - "PacketsSent"
+        - "PendingRevalidationCount"
+        - "TickTime"
+
+    - name: replicatedserverconns
+      obj : "org.apache.ZooKeeperService:name0=ReplicatedServer_id*,name1=replica*,name2=*,name3=Connections,name4=*,name5=*"
+      resultAlias : "replicatedserverconns"
+      attr:
+        - "AvgLatency"
+        - "LastLatency"
+        - "MaxLatency"
+        - "MinLatency"
+        - "OutstandingRequests"
+        - "PacketsReceived"
+        - "PacketsSent"
+
+
+sets:
+  - setname: zookeeper_jmxtrans
+    query_names:
+            - mempool
+            - jvm_mem
+            - gc
+            - sys
+            - threads
+            - quorumsize
+            - replicatedserver
+            - replicatedserverconns
+
+    hosts:
+            - 127.0.0.1

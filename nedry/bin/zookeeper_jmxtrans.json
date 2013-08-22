@@ -1,0 +1,191 @@
+{
+ "servers": [
+  {
+   "numQueryThreads": 8, 
+   "host": "127.0.0.1", 
+   "port": 9011, 
+   "queries": [
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "memorypool", 
+     "obj": "java.lang:type=MemoryPool,name=*", 
+     "attr": [
+      "Usage"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "jvm_mem", 
+     "obj": "java.lang:type=Memory", 
+     "attr": [
+      "HeapMemoryUsage", 
+      "NonHeapMemoryUsage"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "gc", 
+     "obj": "java.lang:type=GarbageCollector,name=*", 
+     "attr": [
+      "CollectionCount", 
+      "CollectionTime"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "sys", 
+     "obj": "java.lang:type=OperatingSystem", 
+     "attr": [
+      "SystemLoadAverage", 
+      "AvailableProcessors", 
+      "TotalPhysicalMemorySize", 
+      "FreePhysicalMemorySize", 
+      "TotalSwapSpaceSize", 
+      "FreeSwapSpaceSize", 
+      "OpenFileDescriptorCount", 
+      "MaxFileDescriptorCount"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "threads", 
+     "obj": "java.lang:type=Threading", 
+     "attr": [
+      "DaemonThreadCount", 
+      "PeakThreadCount", 
+      "ThreadCount", 
+      "TotalStartedThreadCount"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "quorumsize", 
+     "obj": "org.apache.ZooKeeperService:name0=ReplicatedServer_id*", 
+     "attr": [
+      "QuorumSize"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "replicatedserver", 
+     "obj": "org.apache.ZooKeeperService:name0=ReplicatedServer_id*,name1=replica*,name2=*", 
+     "attr": [
+      "MaxClientCnxnsPerHost", 
+      "MaxRequestLatency", 
+      "AvgRequestLatency", 
+      "MinRequestLatency", 
+      "MaxSessionTimeout", 
+      "MinSessionTimeout", 
+      "OutstandingRequests", 
+      "PacketsReceived", 
+      "PacketsSent", 
+      "PendingRevalidationCount", 
+      "TickTime"
+     ]
+    }, 
+    {
+     "outputWriters": [
+      {
+       "@class": "com.googlecode.jmxtrans.model.output.GraphiteWriter", 
+       "settings": {
+        "typeNames": [
+         "name"
+        ], 
+        "host": "graphite.server.pri", 
+        "port": 2003
+       }
+      }
+     ], 
+     "resultAlias": "replicatedserverconns", 
+     "obj": "org.apache.ZooKeeperService:name0=ReplicatedServer_id*,name1=replica*,name2=*,name3=Connections,name4=*,name5=*", 
+     "attr": [
+      "AvgLatency", 
+      "LastLatency", 
+      "MaxLatency", 
+      "MinLatency", 
+      "OutstandingRequests", 
+      "PacketsReceived", 
+      "PacketsSent"
+     ]
+    }
+   ]
+  }
+ ]
+}
