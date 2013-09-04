@@ -5,8 +5,6 @@
         "security_group_id": "",
         "source_ami": "",
         "region": "",
-        "awscredential_properties_src": "",
-        "awscredential_properties_target": "",
         "user_account": "",
         "instance_type": "",
         "parsel_tar_src": "",
@@ -16,10 +14,6 @@
         "elasticsearch_version": ""
         ,"jmxtrans_url": ""
         ,"jmxtrans_file": ""
-        ,"priam_war_url": ""
-        ,"priam_war_file": ""
-        ,"priam_jar_url": ""
-        ,"priam_jar_file": ""
         ,"graphite_host": ""
         ,"puppet_host": ""
         ,"parsel_version": ""
