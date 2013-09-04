@@ -5,19 +5,24 @@
         "security_group_id": "",
         "source_ami": "",
         "region": "",
+        "awscredential_properties_src": "",
+        "awscredential_properties_target": "",
         "user_account": "",
         "instance_type": "",
         "parsel_tar_src": "",
         "parsel_tar_target": "",
         "init_parsel_src": "",
         "init_parsel_target": "",
-        "init_parsel_name": ""
+        "elasticsearch_version": ""
         ,"jmxtrans_url": ""
         ,"jmxtrans_file": ""
+        ,"priam_war_url": ""
+        ,"priam_war_file": ""
+        ,"priam_jar_url": ""
+        ,"priam_jar_file": ""
         ,"graphite_host": ""
         ,"puppet_host": ""
         ,"parsel_version": ""
-        ,"zookeeper_version": ""
     }, "builders": [
     {
         "type": "amazon-ebs",
@@ -27,11 +32,11 @@
         "source_ami": "{{user `source_ami`}}",
         "instance_type": "{{user `instance_type`}}",
         "ssh_username": "{{user `user_account`}}",
-        "ami_name": "packer-zookeeper-{{user `zookeeper_version`}}-{{timestamp}}",
-        "ami_description": "Zookeeper AMI {{user `zookeeper_version`}} {{timestamp}}",
+        "ami_name": "packer-cassandra-{{user `elasticsearch_version`}}-{{timestamp}}",
+        "ami_description": "Cassandra AMI {{user `elasticsearch_version`}} {{timestamp}}",
         "security_group_id": "{{user `security_group_id`}}",
         "tags": {
-            "zookeeper_version": "{{user `zookeeper_version`}}"
+            "elasticsearch_version": "{{user `elasticsearch_version`}}"
         }
     }
 ], "provisioners": [
