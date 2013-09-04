@@ -26,8 +26,8 @@
         "source_ami": "{{user `source_ami`}}",
         "instance_type": "{{user `instance_type`}}",
         "ssh_username": "{{user `user_account`}}",
-        "ami_name": "packer-cassandra-{{user `elasticsearch_version`}}-{{timestamp}}",
-        "ami_description": "Cassandra AMI {{user `elasticsearch_version`}} {{timestamp}}",
+        "ami_name": "packer-elasticsearch-{{user `elasticsearch_version`}}-{{timestamp}}",
+        "ami_description": "Elasticsearch AMI {{user `elasticsearch_version`}} {{timestamp}}",
         "security_group_id": "{{user `security_group_id`}}",
         "tags": {
             "elasticsearch_version": "{{user `elasticsearch_version`}}"
