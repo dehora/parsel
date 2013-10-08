@@ -1,12 +1,3 @@
-# Parsel
-
-Parsel is a set of scripts to create an AMI for Cassandra/Kafka and deploy clusters into EC2.
-
-It borrows instance creation techniques from  [ComboAMI](https://github.com/riptano/ComboAMI),
-and uses [Priam](https://github.com/netflix/Priam) with auto-scaling groups for instance management.
-
-AMI creation is done with [Packer](https://packer.io/).
-
 # Documentation
 
  - See [the wiki](https://github.com/dehora/parsel/wiki).

@@ -110,10 +110,6 @@ def run():
             logger.exe("sudo setfacl -R -m d:u::rwx,d:g::rwx,d:m:rwx,d:o:r-x /var/lib/tomcat7/")
             logger.exe("sudo setfacl -R -m d:u::rwx,d:g::rwx,d:m:rwx,d:o:r-x /var/log/tomcat7/")
 
-            logger.exe("sudo adduser tomcat7 sudo")
-            logger.exe("sudo adduser cassandra sudo")
-            logger.info("Permissions completed!\n")
-            config.set_config("instance", "perms", "completed")
         else:
             logger.info('Permissions configuration logged as completed, skipping.')
 

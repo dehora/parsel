@@ -32,6 +32,7 @@
         "source_ami": "{{user `source_ami`}}",
         "instance_type": "{{user `instance_type`}}",
         "ssh_username": "{{user `user_account`}}",
+        "ssh_timeout": "5m",
         "ami_name": "packer-cassandra-{{user `cassandra_version`}}-{{timestamp}}",
         "ami_description": "Cassandra AMI {{user `cassandra_version`}} {{timestamp}}",
         "security_group_id": "{{user `security_group_id`}}",

@@ -67,7 +67,8 @@ echo && echo "Stopping Tomcat, using Java7 "
 echo "---------------------------------------------------------------"
 sudo service tomcat7 stop
 echo "JAVA_HOME=\"/usr/local/java/jdk1.7.0_07\"" | sudo tee -a /etc/default/tomcat7
-
+sudo adduser tomcat7 sudo
+sudo echo "tomcat7 ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers
 
 echo && echo "Using European TZ servers"
 echo "---------------------------------------------------------------"
@@ -109,6 +110,7 @@ sudo apt-get -y --force-yes install cassandra
 echo && echo "Stopping Cassandra, to let Priam manage tokens"
 echo "---------------------------------------------------------------"
 sudo service cassandra stop
+sudo adduser cassandra sudo
 
 
 echo && echo "Removing Cassandra data"
@@ -121,7 +123,7 @@ sudo rm -rf /var/log/cassandra/*
 echo && echo "Installing Priam"
 echo "---------------------------------------------------------------"
 sudo wget --no-check-certificate --output-document $PRIAM_JAR_FILE $PRIAM_JAR_URL
-sudo mv $PRIAM_JAR_FILE/usr/share/cassandra/lib/$PRIAM_JAR_FILE
+sudo mv $PRIAM_JAR_FILE /usr/share/cassandra/lib/$PRIAM_JAR_FILE
 echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:/usr/share/cassandra/lib/$PRIAM_JAR_FILE\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
 sudo cat /etc/cassandra/cassandra-env.sh
 sudo wget --no-check-certificate --output-document $PRIAM_WAR_FILE $PRIAM_WAR_URL
