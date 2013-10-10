@@ -94,6 +94,6 @@ dehora:packer[master]$
 
 ### Cassandra version ###
 
-Parsel defaults to C* 1.1. To build a 1.2 ami set the `cassandra_version` variable to `12x`.
+Parsel defaults to C* 1.2. To build a 1.1 ami set the `cassandra_version` variable to `11x`.
 
 

@@ -12,7 +12,20 @@ quotes = ["Make fists with your toes.",
           "This is agent Johnson. No, the other one.",
           "I could talk about industrialization and men's fashion all day.",
           "Yippee-ki-yay.",
-          "Now I know what a TV dinner feels like."]
+          "Now I know what a TV dinner feels like."
+          "Dude, at least it's an ethos.",
+          "Yeah, well, you know, that's just, like, your opinion, man.",
+          "That rug really tied the room together.",
+          "You want a toe? I can get you a toe, believe me.",
+          "Dude, let's go bowling.",
+          "Donny, these men are nihilists, there's nothing to be afraid of.",
+          "You are entering a world of pain",
+          "I can see you don't want to be cheered up here.",
+          "Nobody calls me Lebowski. You got the wrong guy. I'm the Dude, man.",
+          "For your information, the Supreme Court has roundly rejected prior restraint.",
+          "Hey, nice marmot!",
+          "You know, Dude, I myself dabbled in pacifism once.",
+          "Obviously, you're not a golfer."]
 
 
 def node_type():

@@ -5,8 +5,6 @@
         "security_group_id": "",
         "source_ami": "",
         "region": "",
-        "awscredential_properties_src": "",
-        "awscredential_properties_target": "",
         "user_account": "",
         "instance_type": "",
         "parsel_tar_src": "",
