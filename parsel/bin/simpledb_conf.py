@@ -6,7 +6,7 @@ import time
 from optparse import OptionParser
 
 
-default_bucket = "cayova-backup-cassandra"
+default_bucket = "cassandra-archive" # priam default
 default_zones_available = "eu-west-1a,eu-west-1b,eu-west-1c"
 default_sdb_region = "us-east-1"
 
