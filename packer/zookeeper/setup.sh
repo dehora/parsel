@@ -65,6 +65,11 @@ sudo chown -R ubuntu:ubuntu /home/ubuntu/parsel
 tree /home/ubuntu/parsel
 
 
+echo && echo "Setting Ubuntu's shell to bash"
+echo "---------------------------------------------------------------"
+sudo chsh -s /bin/bash ubuntu
+
+
 echo && echo "Configuring Limits"
 echo "---------------------------------------------------------------"
 echo "* soft nofile 32768" | sudo tee -a /etc/security/limits.conf

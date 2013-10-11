@@ -9,7 +9,7 @@ import exceptions
 from exceptions import SystemExit
 import traceback
 
-configfile = '/var/log/nedry/nedry.log'
+configfile = '/var/log/parsel/parsel.log'
 
 
 def exit_path(config, instance_data, errorMsg, append_msg=False):

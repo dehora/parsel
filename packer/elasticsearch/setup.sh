@@ -9,6 +9,11 @@ echo "GRAPHITE_HOST $GRAPHITE_HOST"
 echo "PUPPET_HOST $PUPPET_HOST"
 
 
+echo && echo "Setting Ubuntu's shell to bash"
+echo "---------------------------------------------------------------"
+sudo chsh -s /bin/bash ubuntu
+
+
 echo && echo "apt-get all the things"
 echo "---------------------------------------------------------------"
 echo "deb http://archive.canonical.com/ precise partner" | sudo tee -a /etc/apt/sources.list.d/java.sources.list

@@ -22,7 +22,7 @@ quotes = ["Nobody tells me nothing.",
           "Mer-man! Mer-man!",
           "Orange Mocha Frappuccino!",
           "I don't listen to any of his music, but I really respect that he's making it.",
-          "Eugoogiligist: A person who delivers eugoogiligies."
+          "Eugoogiligist: A person who delivers eugoogiligies.",
           "I've never even been to Mount Vesuvius.",
           "I'm a coal miner, not a professional film or television actor.",
           "I invented the piano key necktie, I invented it!"]

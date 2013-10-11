@@ -19,5 +19,5 @@ sudo chown -R ubuntu:ubuntu /etc/parsel
 sudo chown -R ubuntu:ubuntu /var/log/parsel
 echo 1 | sudo tee /proc/sys/vm/overcommit_memory
 echo "\n -------------------------------------\n" >> /var/log/parsel/parsel.log
-cd /home/ubuntu/nedry/nedry/rund
+cd /home/ubuntu/parsel/nedry/rund
 python initd_configure.py

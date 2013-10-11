@@ -24,7 +24,7 @@ def disk_tasks(config):
 
 def configure_jmxtrans(config, ipaddr):
     if config.get_config("nedry", "jmxtrans") != "completed":
-        with open('/home/ubuntu/nedry/nedry/ami/zookeeper_jmxtrans.json', 'r') as f:
+        with open('/home/ubuntu/parsel/nedry/bin/zookeeper_jmxtrans.json', 'r') as f:
             json = f.read()
         p = re.compile('"127.0.0.1"')
         json = p.sub('"{0}"'.format(ipaddr), json)
@@ -64,6 +64,7 @@ def run():
         run_puppet_agent()
         disk_tasks(config)
         config.set_config("instance", "initial_configuration", "completed")
+        logger.info('Configuration completed.')
     else:
         logger.info('Initial configuration logged as completed, skipping.')
         restart_tasks_on_reboot(config)
