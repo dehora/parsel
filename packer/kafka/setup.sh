@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#an bug: rm broker id val in /etc/kafka/server.properties
 
 echo && echo "Packer ENV"
 echo "---------------------------------------------------------------"
@@ -10,6 +11,10 @@ echo "PUPPET_HOST $PUPPET_HOST"
 echo "KAFKA_VERSION $KAFKA_VERSION"
 echo "KAFKA_URL KAFKA_URL"
 echo "KAFKA_FILE $KAFKA_FILE"
+
+echo && echo "Setting Ubuntu's shell to bash"
+echo "---------------------------------------------------------------"
+sudo chsh -s /bin/bash ubuntu
 
 
 echo && echo "apt-get all the things"
@@ -101,7 +106,7 @@ sudo echo "$PUPPET_HOST    puppet" | sudo tee -a /etc/hosts
 echo && echo "Configuring .profile"
 echo "---------------------------------------------------------------"
 sudo chmod 777 /home/ubuntu/.profile
-sudo echo "python parsel/parsel/rund/motd.py" | sudo tee -a  /home/ubuntu/.profile
+sudo echo "python parsel/mause/rund/motd.py" | sudo tee -a  /home/ubuntu/.profile
 sudo echo "export PYTHONPATH=\${PYTHONPATH}:/home/ubuntu/parsel" | sudo tee -a  /home/ubuntu/.profile
 sudo chmod 644 /home/ubuntu/.profile
 

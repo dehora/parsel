@@ -21,9 +21,10 @@ quotes = ["Make fists with your toes.",
           "Donny, these men are nihilists, there's nothing to be afraid of.",
           "You are entering a world of pain",
           "I can see you don't want to be cheered up here.",
-          "Nobody calls me Lebowski. You got the wrong guy. I'm the Dude, man.",
+          "I'm the Dude, man.",
           "For your information, the Supreme Court has roundly rejected prior restraint.",
           "Hey, nice marmot!",
+          "Ve vant ze money, Lebowski.",
           "You know, Dude, I myself dabbled in pacifism once.",
           "Obviously, you're not a golfer."]
 
