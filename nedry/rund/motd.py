@@ -13,7 +13,19 @@ quotes = ["Nobody tells me nothing.",
           "Yarp.",
           "Crusty jugglers.",
           "Cornetto.",
-          "Narp?"]
+          "Narp?",
+          "It's a walk-off!",
+          "I'm not an ambi-turner.",
+          "Oh, Snap!",
+          "Or did you think I was too stupid to know what a eugoogooly was?",
+          "You can read minds?",
+          "Mer-man! Mer-man!",
+          "Orange Mocha Frappuccino!",
+          "I don't listen to any of his music, but I really respect that he's making it.",
+          "Eugoogiligist: A person who delivers eugoogiligies."
+          "I've never even been to Mount Vesuvius.",
+          "I'm a coal miner, not a professional film or television actor.",
+          "I invented the piano key necktie, I invented it!"]
 
 
 def node_type():
