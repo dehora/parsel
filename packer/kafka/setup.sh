@@ -9,7 +9,7 @@ echo "JMXTRANS_FILE $JMXTRANS_FILE"
 echo "GRAPHITE_HOST $GRAPHITE_HOST"
 echo "PUPPET_HOST $PUPPET_HOST"
 echo "KAFKA_VERSION $KAFKA_VERSION"
-echo "KAFKA_URL KAFKA_URL"
+echo "KAFKA_URL $KAFKA_URL"
 echo "KAFKA_FILE $KAFKA_FILE"
 
 echo && echo "Setting Ubuntu's shell to bash"
